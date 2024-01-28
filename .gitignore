@@ -2,8 +2,7 @@
 
 prod_settings.py
 local_settings.py
-BT2023/local_settings.py
-BT2023/prod_settings.py
+
 media
 logs
 static/

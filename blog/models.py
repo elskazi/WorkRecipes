@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
@@ -24,7 +25,9 @@ class News(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Изменено')
     photo = models.ImageField(upload_to='photos/%Y/%m/%d/', verbose_name='Изображение', blank=True)
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='Категория', )
+    created_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT)
+    archived = models.BooleanField(default=False, verbose_name='В архив')
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='Категория', related_name='category'  )
     views = models.IntegerField(default=0, verbose_name='Просмотры', )
 
     class Meta:

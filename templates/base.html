@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+            Base title
+        {% endblock %}
+    </title>
+</head>
+<body>
+{# {% include 'menu.html' %}#}
+{% block body %}
+    Base body
+{% endblock %}
+
+<hr>
+<div>{% now 'h:i' %}</div>
+
+<div>
+
+        {% now 'l' as current_weekday %} 
+        Today is {{ current_weekday }} <br>
+        {{ request.method }} <br>
+        
+
+</div>
+
+
+</body>
+</html>

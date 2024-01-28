@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ page_header }}
+{% endblock %}
+
+{% block body %}
+    <h1>{{ page_title }}</h1>
+    <h2>{{ ipaddress }}</h2>
+
+    {% if object_list %}
+        {% for item in object_list %}
+            <div>{{ item.title }}</div>
+            <div>{{ item.created_at }}</div>
+            <div>{{ item.created_by }}</div>
+            <div>{{ item.content }}</div>
+            <div>{{ item.photo }}</div>
+            
+            <br> <hr> <br>
+        {% endfor %}
+    {% else %}
+        <h2>Новостей пока нет</h2>
+    {% endif %}
+
+{% endblock %}
