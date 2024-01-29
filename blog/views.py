@@ -13,6 +13,7 @@ class NewsListViews(ListView):
     # extra_context = {'title' : 'Главная'} # почету то так не используют
     page_header = '1 Список новостей'
     page_title = '2 Список новостей'
+    queryset = News.objects.filter(archived=False).select_related('category')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """ GET:param object_list::param kwargs::return:"""
