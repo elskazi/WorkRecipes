@@ -10,9 +10,8 @@
 
     {% if object_list %}
         {% for item in object_list %}
-            <div>{{ item.title }}</div>
-            <div>{{ item.created_at }}</div>
-            <div>{{ item.created_by }}</div>
+            <div><h3>{{ item.title }}</h3></div>
+            <div><h6>{{ item.created_at }} | {{ item.created_by }}</h6></div>
             <div>{{ item.content }}</div>
             <div>{{ item.photo }}</div>
             
