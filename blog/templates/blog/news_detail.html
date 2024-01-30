@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ object.title }} | {{ block.super }}
+{% endblock %}
+
+{% block body %}
+
+    {% if object.photo %}
+        <img src="{{ object.photo.url }}" width="500px" height="auto">
+    {% else %}
+        <img src="{{ page_default_img }}" width="500px" height="auto">
+    {% endif %}
+    <div><h3>{{ object.title }} </h3></div>
+    <div><h6>{{ object.created_at }} | {{ object.created_by }} | {{ object.category.title }}</h6></div>
+    <div>{{ object.content }}</div>
+
+{% endblock %}

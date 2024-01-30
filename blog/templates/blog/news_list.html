@@ -1,22 +1,21 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}
-    {{ page_header }}
+     {{ page_title }} | {{ block.super }}
 {% endblock %}
 
 {% block body %}
-    <h1>{{ page_title }}</h1>
+    <h1>{{ page_header }}</h1>
     <h2>{{ ipaddress }}</h2>
 
     {% if object_list %}
         {% for item in object_list %}
             {% if item.photo %}
-                <img src="{{ item.photo.url }}" width="400px" height="auto" >
+                <img src="{{ item.photo.url }}" width="500px" height="auto" >
             {% else %}
-                <img src="{% get_media_prefix %}/BestCow800x450.jpg" width="400px" height="auto">
+                <img src="{{ page_default_img }}" width="500px" height="auto">
             {% endif %}
-            <div><h3>{{ item.title }}</h3></div>
+            <div><h3><a href="{% url 'blog:news_detail' pk=item.pk  %}">{{ item.title }}</a> </h3></div>
             <div><h6>{{ item.created_at }} | {{ item.created_by }} | {{ item.category.title }}</h6></div>
             <div>{{ item.content|linebreaks|truncatewords:40 }}</div>
             <div><button>Подроблнее</button> </div>
