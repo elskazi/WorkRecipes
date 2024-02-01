@@ -1,20 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru-RU">
 <head>
     <meta charset="UTF-8">
-    
-    <title>
-        {% block title %}Work work!{% endblock %} 
-    </title>
-       
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/wp-content/uploads/2024/02/WorkWork.png" sizes="any">
+    <link rel="apple-touch-icon" href="/wp-content/uploads/2024/02/WorkWork.png">
+
+    <title>{% block title %}Work work!{% endblock %}</title>
+    <meta name='robots' content='max-image-preview:large'/>
+
+    <link href="http://192.168.3.113:81/wp-content/themes/yootheme/css/theme.1.css?ver=1706707609" rel="stylesheet">
+
+    <meta name="generator" content="WordPress 69.4.3"/>
+    <link rel="canonical" href="http://192.168.3.113:81/"/>
+    <link rel='shortlink' href='http://192.168.3.113:81/'/>
+
+    <script src="http://192.168.3.113:81/wp-content/themes/yootheme/vendor/assets/uikit/dist/js/uikit.min.js?ver=4.0.11"></script>
+    <script src="http://192.168.3.113:81/wp-content/themes/yootheme/vendor/assets/uikit/dist/js/uikit-icons-devstack.min.js?ver=4.0.11"></script>
+    <script src="http://192.168.3.113:81/wp-content/themes/yootheme/js/theme.js?ver=4.0.11"></script>
+
 </head>
-<body>
-{# {% include 'menu.html' %}#}
-{% block body %}
-    Base body
-{% endblock %}
+<body class="home page-template-default">
+
+<div class="uk-hidden-visually uk-notification uk-notification-top-left uk-width-auto">
+    <div class="uk-notification-message">
+        <a href="#tm-main">Перейти к основному содержанию</a>
+    </div>
+</div>
 
 
+<div class="tm-page">
 
+    {% include 'inc/head.html' %}
+
+    {% block body %}
+        Base body
+    {% endblock %}
+
+
+    {% include 'inc/footer.html' %}
+</div>
 </body>
 </html>
