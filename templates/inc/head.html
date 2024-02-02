@@ -1,3 +1,4 @@
+{%load static %}
 <!-- Мобила -->
 <header class="tm-header-mobile uk-hidden@m" uk-header>
     <div class="uk-navbar-container">
@@ -6,8 +7,8 @@
                 <div class="uk-navbar-left">
                     <a href="#" aria-label="Вернуться на главную"
                        class="uk-logo uk-navbar-item">
-                        <img alt="Work work!" loading="eager" width="145" height="30"
-                             src="/wp-content/uploads/2024/01/logo.svg"></a>
+                        <img alt="Work work!" loading="eager" width="155" height="30"
+                             src="{% static 'logo.svg' %}"></a>
                 </div>
                 <div class="uk-navbar-right">
                     <a uk-toggle href="#tm-dialog-mobile" class="uk-navbar-toggle">
@@ -44,7 +45,7 @@
     </div>
 </header>
 
-<!-- Desctop -->
+<!-- Desktop -->
 <header class="tm-header uk-visible@m" uk-header>
     <div class="uk-navbar-container">
         <div class="uk-container">
@@ -54,7 +55,7 @@
                     <a href="{% url 'blog:news_list' %}" aria-label="Вернуться в начало"
                        class="uk-logo uk-navbar-item">
                         <img alt="Work work!" loading="eager" width="145" height="30"
-                             src="/wp-content/uploads/2024/01/logo.svg"></a>
+                             src="{% static 'logo.svg' %}"></a>
                 </div>
                 <div class="uk-navbar-center">
                     <ul class="uk-navbar-nav">

@@ -17,7 +17,7 @@ class NewsListViews(ListView):
     # extra_context = {'title' : 'Главная'} # почету то так не используют
     page_header = 'Блог'
     page_title = 'Блог'
-    page_default_img = f'{settings.MEDIA_URL}BestCow800x450.jpg'
+    page_default_img = f'{settings.STATIC_URL}BestCow800x450.jpg'
     queryset = News.objects.filter(is_published=True).select_related('category').select_related('created_by')
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -32,7 +32,7 @@ class NewsListViews(ListView):
 
 class NewsDetailViews(DetailView):
     model = News
-    page_default_img = f'{settings.MEDIA_URL}BestCow800x450.jpg'
+    page_default_img = f'{settings.STATIC_URL}BestCow800x450.jpg'
     def get_context_data(self, *, object_list=None, **kwargs):
         """ GET:param object_list::param kwargs::return:"""
         context = super(NewsDetailViews, self).get_context_data(**kwargs)
