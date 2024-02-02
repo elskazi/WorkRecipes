@@ -9,9 +9,14 @@
         <!--  -->
         <div id="blog" class="uk-section-default uk-section">
             <div class="uk-container">
-                <p>
-                    {{ request_resolver_match }}
-                </p>
+                <h3>request.resolver_match </h3>
+                <p>{{ request_resolver_match }}</p>
+                <h3>request.meta ipaddress </h3>
+                <p>{{ ipaddress }}</p>
+                <h3>request.meta  </h3>
+                <p>{{ meta }}</p>
+                <h3>request </h3>
+                <p>{{ request }}</p>
             </div>
         </div>
     </main>

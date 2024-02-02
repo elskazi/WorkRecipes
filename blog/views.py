@@ -25,7 +25,6 @@ class NewsListViews(ListView):
         context = super(NewsListViews, self).get_context_data(**kwargs)
         context['page_header'] = self.page_header
         context['page_title'] = self.page_title
-        context['ipaddress'] = self.request.META['REMOTE_ADDR']
         context['page_default_img'] = self.page_default_img
         return context
 
@@ -56,9 +55,12 @@ class NewsCreateViews(CreateView):
 class HttpRequestPage(View):
     def get(self, request: HttpRequest) -> HttpResponse:
 
-        request_resolver_match = request.resolver_match
+
         context = {
-            'request_resolver_match': request_resolver_match,
+            'request_resolver_match': request.resolver_match,
+            'ipaddress': request.META['REMOTE_ADDR'],
+            'meta': request.META,
+            'request': request
 
         }
         return render(request, "blog/http_request_page.html", context=context)
