@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ page_title }} | {{ block.super }}
+{% endblock %}
+
+
+{% block body %}
+    <main id="tm-main">
+        <!--  -->
+        <div id="blog" class="uk-section-default uk-section">
+            <div class="uk-container">
+                <p>
+                    {{ request_resolver_match }}
+                </p>
+            </div>
+        </div>
+    </main>
+    
+
+{% endblock %}

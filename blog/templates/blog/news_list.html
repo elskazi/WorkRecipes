@@ -7,7 +7,6 @@
 
 {% block body %}
     <main id="tm-main">
-
         <!--  -->
         <div id="blog" class="uk-section-default uk-section">
             <div class="uk-container">
@@ -21,8 +20,7 @@
                         <div class="uk-margin">
                             <div class="uk-grid uk-child-width-1-1 uk-child-width-1-2@m uk-grid-column-medium uk-grid-match"
                                  uk-grid>
-
-                                
+                            
                                 {% if object_list %}
                                     {% for item in object_list %}
                                         <div>
@@ -43,6 +41,7 @@
                                                             {{ item.created_by }} |
                                                             {{ item.category.title }} | 
                                                             {{ item.created_at }}
+                                                            
                                                         </div>
                                                         <div class="el-content uk-panel uk-margin-top">
                                                             {{ item.content|linebreaks|truncatechars:77 }}

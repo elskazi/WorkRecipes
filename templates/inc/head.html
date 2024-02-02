@@ -1,95 +1,100 @@
+<!-- Мобила -->
 <header class="tm-header-mobile uk-hidden@m" uk-header>
-        <div class="uk-navbar-container">
-            <div class="uk-container uk-container-expand">
-                <nav class="uk-navbar" uk-navbar="{&quot;container&quot;:&quot;.tm-header-mobile&quot;}">
-                    <div class="uk-navbar-left">
-                        <a href="http://192.168.3.113:81/" aria-label="Вернуться на главную"
-                           class="uk-logo uk-navbar-item">
-                            <img alt="Work work!" loading="eager" width="145" height="30"
-                                 src="/wp-content/uploads/2024/01/logo.svg"></a>
-                    </div>
-                    <div class="uk-navbar-right">
-                        <a uk-toggle href="#tm-dialog-mobile" class="uk-navbar-toggle">
-                            <div uk-navbar-toggle-icon></div>
-                        </a>
-                    </div>
-                </nav>
-            </div>
+    <div class="uk-navbar-container">
+        <div class="uk-container uk-container-expand">
+            <nav class="uk-navbar" uk-navbar="{&quot;container&quot;:&quot;.tm-header-mobile&quot;}">
+                <div class="uk-navbar-left">
+                    <a href="#" aria-label="Вернуться на главную"
+                       class="uk-logo uk-navbar-item">
+                        <img alt="Work work!" loading="eager" width="145" height="30"
+                             src="/wp-content/uploads/2024/01/logo.svg"></a>
+                </div>
+                <div class="uk-navbar-right">
+                    <a uk-toggle href="#tm-dialog-mobile" class="uk-navbar-toggle">
+                        <div uk-navbar-toggle-icon></div>
+                    </a>
+                </div>
+            </nav>
         </div>
+    </div>
 
 
-        <div id="tm-dialog-mobile" uk-offcanvas="container: true; overlay: true" mode="slide" flip>
-            <div class="uk-offcanvas-bar uk-flex uk-flex-column">
-                <button class="uk-offcanvas-close uk-close-large" type="button" uk-close
-                        uk-toggle="cls: uk-close-large; mode: media; media: @s"></button>
-                <div class="uk-margin-auto-bottom">
-                    <div class="uk-grid uk-child-width-1-1">
-                        <div>
-                            <div class="uk-panel widget widget_nav_menu" id="nav_menu-2">
-                                <ul class="uk-nav uk-nav-default">
-                                    <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home current-menu-item page_item page-item-6 current_page_item uk-active">
-                                        <a href="http://192.168.3.113:81/"> Main page</a></li>
-                                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a
-                                            href="http://192.168.3.113:81/sample-page/"> Пример страницы</a></li>
-                                    <li class="menu-item menu-item-type-taxonomy menu-item-object-category"><a
-                                            href="http://192.168.3.113:81/category/%d0%b1%d0%b5%d0%b7-%d1%80%d1%83%d0%b1%d1%80%d0%b8%d0%ba%d0%b8/">
-                                        Без рубрики</a></li>
-                                </ul>
-                            </div>
+    <div id="tm-dialog-mobile" uk-offcanvas="container: true; overlay: true" mode="slide" flip>
+        <div class="uk-offcanvas-bar uk-flex uk-flex-column">
+            <button class="uk-offcanvas-close uk-close-large" type="button" uk-close
+                    uk-toggle="cls: uk-close-large; mode: media; media: @s"></button>
+            <div class="uk-margin-auto-bottom">
+                <div class="uk-grid uk-child-width-1-1">
+                    <div>
+                        <div class="uk-panel widget widget_nav_menu" id="nav_menu-2">
+                            <ul class="uk-nav uk-nav-default">
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home current-menu-item page_item page-item-6 current_page_item uk-active">
+                                    <a href="#"> Main page</a></li>
+                                <li class="menu-item menu-item-type-post_type menu-item-object-page"><a
+                                        href="#"> Пример страницы</a></li>
+                                <li class="menu-item menu-item-type-taxonomy menu-item-object-category"><a
+                                        href="#">
+                                    Без рубрики</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </header>
+    </div>
+</header>
 
+<!-- Desctop -->
+<header class="tm-header uk-visible@m" uk-header>
+    <div class="uk-navbar-container">
+        <div class="uk-container">
+            <nav class="uk-navbar"
+                 uk-navbar="{&quot;align&quot;:&quot;left&quot;,&quot;container&quot;:&quot;.tm-header&quot;,&quot;boundary&quot;:&quot;.tm-header .uk-navbar-container&quot;}">
+                <div class="uk-navbar-left">
+                    <a href="{% url 'blog:news_list' %}" aria-label="Вернуться в начало"
+                       class="uk-logo uk-navbar-item">
+                        <img alt="Work work!" loading="eager" width="145" height="30"
+                             src="/wp-content/uploads/2024/01/logo.svg"></a>
+                </div>
+                <div class="uk-navbar-center">
+                    <ul class="uk-navbar-nav">
+                        <li class="menu-item  menu-item-home 
+                                        {% if request.resolver_match.url_name == "news_list" %}uk-active{% endif %} ">
+                            <a href="{% url 'blog:news_list' %}">Главная</a></li>
+                    
+                        <li class="menu-item 
+                                    {% if request.resolver_match.url_name == "news_create" %}uk-active{% endif %}"><a
+                                href="{% url 'blog:news_create' %}">Добавить</a></li>
+                    
+                        <li class="menu-item 
+{% if request.resolver_match.url_name == "news_request" %}uk-active{% endif %}"><a
+                                href="{% url 'blog:news_request' %}">Запросы</a></li>
+                    </ul>
+                </div>
 
-    <header class="tm-header uk-visible@m" uk-header>
-        <div class="uk-navbar-container">
-            <div class="uk-container">
-                <nav class="uk-navbar"
-                     uk-navbar="{&quot;align&quot;:&quot;left&quot;,&quot;container&quot;:&quot;.tm-header&quot;,&quot;boundary&quot;:&quot;.tm-header .uk-navbar-container&quot;}">
-                    <div class="uk-navbar-left">
-                        <a href="{% url 'blog:news_list' %}" aria-label="Вернуться в начало"
-                           class="uk-logo uk-navbar-item">
-                            <img alt="Work work!" loading="eager" width="145" height="30"
-                                 src="/wp-content/uploads/2024/01/logo.svg"></a>
-                    </div>
-                    <div class="uk-navbar-center">
-                        <ul class="uk-navbar-nav">
-                            <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home 
-                                        current-menu-item page_item page-item-6 current_page_item uk-active">
-                                <a href="{% url 'blog:news_list' %}">Главная</a></li>
-                            <li class="menu-item menu-item-type-post_type menu-item-object-page"><a
-                                    href="{% url 'blog:news_list' %}">Пример страницы</a></li>
-                            <li class="menu-item menu-item-type-taxonomy menu-item-object-category"><a
-                                    href="{% url 'blog:news_list' %}">Страница</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="uk-navbar-right">
-                        <div class="uk-navbar-item widget widget_builderwidget" id="builderwidget-3">
-                            <div class="uk-grid tm-grid-expand uk-child-width-1-1 uk-grid-margin">
-                                <div class="uk-width-1-1">
-                                    <div class="uk-margin">
-                                        <div class="uk-flex-middle uk-grid-small uk-child-width-auto" uk-grid>
-                                            <div class="el-item">
-                                                <a class="el-content" href="#" uk-scroll>
-                                                    <b>Войти</b>
-                                                </a>
-                                            </div>
-                                            <div class="el-item">
-                                                <a class="el-content uk-button uk-button-primary" href="#" uk-scroll>
-                                                    Регистрация
-                                                </a>
-                                            </div>
+                <div class="uk-navbar-right">
+                    <div class="uk-navbar-item widget widget_builderwidget" id="builderwidget-3">
+                        <div class="uk-grid tm-grid-expand uk-child-width-1-1 uk-grid-margin">
+                            <div class="uk-width-1-1">
+                                <div class="uk-margin">
+                                    <div class="uk-flex-middle uk-grid-small uk-child-width-auto" uk-grid>
+                                        <div class="el-item">
+                                            <a class="el-content" href="#" uk-scroll>
+                                                <b>Войти</b>
+                                            </a>
+                                        </div>
+                                        <div class="el-item">
+                                            <a class="el-content uk-button uk-button-primary" href="#" uk-scroll>
+                                                Регистрация
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </nav>
-            </div>
+                </div>
+            </nav>
         </div>
-    </header>
+    </div>
+</header>

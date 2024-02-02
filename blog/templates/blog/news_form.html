@@ -1,17 +1,27 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    {{ page_header }}
+    {{ page_header }} | {{ block.super }}
 {% endblock %}
 
 {% block body %}
-    <h1>{{ page_title }}</h1>
-    <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Отправить</button>
-    </form>
+    <main id="tm-main">
+        <!--  -->
+        <div id="blog" class="uk-section-default uk-section">
+            <div class="uk-container">
 
-   
+                <h1>{{ page_title }}</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit">Отправить</button>
+                </form>
+
+
+            </div>
+        </div>
+    </main>
+
+
 
 {% endblock %}
