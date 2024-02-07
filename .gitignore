@@ -1,12 +1,5 @@
 .idea/
 
-prod_settings.py
-local_settings.py
-
-media
-logs
-static/
-
 # Created by https://www.gitignore.io/api/macos,linux,django,python,pycharm
 
 ### Django ###
