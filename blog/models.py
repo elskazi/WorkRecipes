@@ -1,41 +1,93 @@
-from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
-from django_resized import ResizedImageField
+from django_resized import ResizedImageField  # resizer image
+from django_ckeditor_5.fields import CKEditor5Field  # text editor
+from mptt.models import MPTTModel, TreeForeignKey  # MPTT категории
 
-class Category(models.Model):
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+"""
+о get_user_model() по ссылке
+# https://proghunter.ru/articles/django-base-2023-building-a-module-blog-and-model-articles-2
+"""
+
+
+class Category(MPTTModel):
+    """
+    Модель категорий с вложенностью
+    """
     title = models.CharField(max_length=200, verbose_name='Заголовок категории', db_index=True)
+    slug = models.SlugField(max_length=255, verbose_name='URL категории', blank=True)
+    description = models.TextField(verbose_name='Описание категории', max_length=300)
+    parent = TreeForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        db_index=True,
+        related_name='children',
+        verbose_name='Родительская категория'
+    )
 
-    def get_absolute_url(self):
-        return reverse('category', kwargs={"category_id": self.pk, }, )
+    class MPTTMeta:
+        """
+        Сортировка по вложенности
+        """
+        order_insertion_by = ('title',)
+
 
     class Meta:
+        """
+        Сортировка, название модели в админ панели, таблица в данными
+        """
         verbose_name = 'Категория'  # Имя модели в единственном числе
         verbose_name_plural = 'Категории'  # Имя модели в множ. числе
         ordering = ['title']
 
+    def get_absolute_url(self):
+        return reverse('category', kwargs={"category_id": self.pk, }, )
+
     def __str__(self):
+        """
+        Возвращение заголовка статьи
+        """
         return self.title
 
 
 class News(models.Model):
+    """
+    Модель постов для сайта
+    """
+
     title = models.CharField(max_length=200, verbose_name='Заголовок')
-    content = models.TextField(blank=True, verbose_name='Контент', )
+    slug = models.SlugField(verbose_name='URL', max_length=255, blank=True, unique=True)
+    short_content = CKEditor5Field(blank=True, verbose_name='Краткое описание', max_length=500)
+    content = CKEditor5Field(blank=True, verbose_name='Статья', )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Изменено')
-    photo = ResizedImageField(size=[1920, 1080], crop=['middle', 'center'], upload_to='photos/%Y/%m/%d/', verbose_name='Изображение', blank=True)
-    is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
-    created_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='Категория', related_name='category'  )
+    photo = ResizedImageField(size=[1920, 1080], crop=['middle', 'center'], upload_to='photos/%Y/%m/%d/',
+                              verbose_name='Изображение', blank=True)
+    is_published = models.BooleanField(default=True, verbose_name='Статус поста')
+    created_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, verbose_name='Автор',
+                                   related_name='author_posts')
+    category = TreeForeignKey(Category, on_delete=models.PROTECT, verbose_name='Категория', related_name='articles')
+    updater = models.ForeignKey(to=User, verbose_name='Обновил', on_delete=models.SET_NULL, null=True,
+                                related_name='updater_posts', blank=True)
+    fixed = models.BooleanField(verbose_name='Зафиксировано', default=False)
     views = models.IntegerField(default=0, verbose_name='Просмотры', )
 
     class Meta:
         verbose_name = 'Новость'  # Имя модели в единственном числе
         verbose_name_plural = 'Новости'  # Имя модели в множ. числе
-        ordering = ['-created_at', 'title']
+        indexes = [models.Index(fields=['-fixed', '-created_at', 'is_published'])]
+        ordering = ['-fixed', '-created_at', 'title']
 
     # def get_absolute_url(self):
     #     return reverse('view_news', kwargs={"pk": self.pk, }, ) Еще нет имени ссылки
 
     def __str__(self):
+        """
+        Возвращение заголовка статьи
+        """
         return self.title

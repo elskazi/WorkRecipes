@@ -24,7 +24,7 @@ src="{% if object.photo %}{{ object.photo.url }}{% else %}{{ page_default_img }}
                              class="el-image" alt="{{ object.title }}" loading="lazy">
                     </div>
                     <div class="uk-panel uk-margin">
-                       {{ object.content|linebreaks }}
+                       {{ object.content|safe|linebreaks }}
                     </div>
                 </div>
                 <!-- Side bar -->
