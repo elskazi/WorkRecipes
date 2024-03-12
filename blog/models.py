@@ -45,7 +45,7 @@ class Category(MPTTModel):
         ordering = ['title']
 
     def get_absolute_url(self):
-        return reverse('category', kwargs={"category_id": self.pk, }, )
+        return reverse('blog:news_by_category', kwargs={'slug': self.slug}) #kwargs={"category_id": self.pk, }, )
 
     def __str__(self):
         """

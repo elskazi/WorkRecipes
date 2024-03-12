@@ -6,8 +6,6 @@ from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import News, Category
 
-
-
 class NewsListViews(ListView):
     model = News
     paginate_by = 10
@@ -17,7 +15,6 @@ class NewsListViews(ListView):
     # extra_context = {'title' : 'Главная'} # почету то так не используют
     page_header = 'Блог Аркаши'
     page_title = 'Блог Аркаши'
-    page_default_img = f'{settings.STATIC_URL}BestCow800x450.jpg'
     queryset = News.objects.filter(is_published=True).select_related('category').select_related('created_by')
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -25,18 +22,16 @@ class NewsListViews(ListView):
         context = super(NewsListViews, self).get_context_data(**kwargs)
         context['page_header'] = self.page_header
         context['page_title'] = self.page_title
-        context['page_default_img'] = self.page_default_img # если нет изобраение то это
         return context
 
 
 class NewsDetailViews(DetailView):
+    """Детали статьи"""
     model = News
-    page_default_img = f'{settings.STATIC_URL}BestCow800x450.jpg'
     def get_context_data(self, *, object_list=None, **kwargs):
         """ GET:param object_list::param kwargs::return:"""
         context = super(NewsDetailViews, self).get_context_data(**kwargs)
-        context['title'] = self.object.title                # получить заголовок из статьи
-        context['page_default_img'] = self.page_default_img # если нет изобраение то это
+        context['title'] = self.object.title     # получить заголовок, ЗАЧЕМ? если может из обьекта, не исплольз
         return context
 
 
@@ -53,10 +48,32 @@ class NewsCreateViews(CreateView):
         context['page_title'] = self.page_title
         return context
 
+class NewsByCategoryListView(ListView):
+    '''
+    представление для сортировки статей по категориям
+    типа кликая на категорию попадаем в список отсоритрованный по этой категории
+    '''
+    model = News
+    category = None
+    # template_name = 'blog/news_list.html'     # имя шаблона
+    # context_object_name = 'news_list'         # имя обьекта для перебора
+    def get_queryset(self):
+        self.category = Category.objects.get(slug=self.kwargs['slug'])      # достаем название категории слаг=слаг
+        queryset = News.objects.all().filter(category__slug=self.category.slug, is_published=True )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = self.category.title
+        context['page_header'] = f'Статьи из категории: {self.category.title}'
+        return context
+
+
+
 class HttpRequestPage(View):
+    """Страница запросов.
+    для тестов"""
     def get(self, request: HttpRequest) -> HttpResponse:
-
-
         context = {
             'request_resolver_match': request.resolver_match,
             'ipaddress': request.META['REMOTE_ADDR'],
@@ -65,3 +82,6 @@ class HttpRequestPage(View):
 
         }
         return render(request, "blog/http_request_page.html", context=context)
+
+
+
