@@ -1,10 +1,10 @@
 """
 python -m pip install Pillow
 git init
-#pip install tox   #  uninstall
-pip install django-resized # https://github.com/un1t/django-resized
+pip install django-resized  Изменяет размер и качество избражения https://github.com/un1t/django-resized
 pip install django-ckeditor-5
-pip install django-mptt     МРТТ категории вложенные
+pip install django-mptt     МРТТ категории вложенные (можно одну категория вклыдвать в другую категорию)
+pip install pytils          сохранения уникального slug https://proghunter.ru/articles/django-base-2023-automatic-slug-generation-cyrillic-handling-in-django-9
 
 """
 
@@ -34,8 +34,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'mptt',  # MPTT вложенные категории
+    'mptt',                 # MPTT вложенные категории
     'django_ckeditor_5',
+    'services' ,             # folder for utils
+
 
     'blog.apps.BlogConfig',
 
@@ -111,10 +113,10 @@ USE_I18N = True
 USE_TZ = True
 
 """Подключение статики и медиа."""
-STATIC_URL = 'static/'  # как быдет выглядеть ссылка
-STATIC_ROOT = BASE_DIR / 'static'  # общие для всех
-STATICFILES_DIRS = [  # доп папки со статикой, для отдельных приложений
-    BASE_DIR / 'blog/static',
+STATIC_URL = 'static/'              # как быдет выглядеть ссылка
+STATIC_ROOT = BASE_DIR / 'static'   # общие для всех
+STATICFILES_DIRS = [                # доп папки со статикой, для отдельных приложений
+    BASE_DIR / 'templates/src',
 ]
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'

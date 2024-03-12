@@ -6,12 +6,16 @@ from .models import News, Category
 class NewsAdmin(admin.ModelAdmin):
     list_display = ('id', 'title','category', 'created_at', 'created_by')
     list_display_links = ('id', 'title')
+    prepopulated_fields = {'slug': ('title',)}      # auto use slug in admin
+    save_on_top = True
+    #save_as = True
 
 @admin.register(Category)
 class CategoryAdmin(DraggableMPTTAdmin):
     list_display = ('tree_actions', 'indented_title', 'id', 'title', 'slug',)
     list_display_links = ('id', 'title', 'slug',)
     prepopulated_fields = {'slug': ('title',)}
+    save_on_top = True
     fieldsets = (
         ('Основная инфрмация', {'fields':('title', 'slug', 'parent')}),
         ('Описание', {'fields': ('description',)}),

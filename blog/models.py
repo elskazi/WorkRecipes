@@ -1,12 +1,14 @@
 from django.db import models
 from django.urls import reverse
-from django_resized import ResizedImageField  # resizer image
+from django_resized import ResizedImageField        # resizer image
 from django_ckeditor_5.fields import CKEditor5Field  # text editor
-from mptt.models import MPTTModel, TreeForeignKey  # MPTT категории
+from mptt.models import MPTTModel, TreeForeignKey   # MPTT категории
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model      # model USER
+from services.utils import unique_slugify           # use my utils for slug unical
 
-User = get_user_model()
+
+User = get_user_model()                             # use model USER
 """
 о get_user_model() по ссылке
 # https://proghunter.ru/articles/django-base-2023-building-a-module-blog-and-model-articles-2
@@ -29,14 +31,11 @@ class Category(MPTTModel):
         related_name='children',
         verbose_name='Родительская категория'
     )
-
     class MPTTMeta:
         """
         Сортировка по вложенности
         """
         order_insertion_by = ('title',)
-
-
     class Meta:
         """
         Сортировка, название модели в админ панели, таблица в данными
@@ -83,11 +82,22 @@ class News(models.Model):
         indexes = [models.Index(fields=['-fixed', '-created_at', 'is_published'])]
         ordering = ['-fixed', '-created_at', 'title']
 
-    # def get_absolute_url(self):
-    #     return reverse('view_news', kwargs={"pk": self.pk, }, ) Еще нет имени ссылки
+    def get_absolute_url(self):
+        """Создаем ссылку на статью, через SLUG. в шаблоне меняем {% url '' %} на {{ item.get_absolute_url }}"""
+        return reverse('blog:news_details', kwargs={'slug': self.slug})
 
     def __str__(self):
         """
         Возвращение заголовка статьи
         """
         return self.title
+
+    def save(self, *args, **kwargs):
+        """
+        Сохранение полей модели при их отсутствии заполнения
+        Генератор уникальных SLUG для моделей, в случае существования такого SLUG.
+        генерация идет от функции unique_slugify  в sevrvies/utls
+        """
+        if not self.slug:
+            self.slug = unique_slugify(self, self.title)
+        super().save(*args, **kwargs)

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{%load static %}
 
 {% block title %}
     {{ page_title }} | {{ block.super }}
@@ -31,10 +32,11 @@
                                             <div class="el-item uk-grid-item-match">
                                                 <a class="uk-card uk-card-default uk-card-small 
                                                 uk-card-hover uk-margin-remove-first-child uk-link-toggle uk-display-block"
-                                                   href="{% url 'blog:news_detail' pk=item.pk %}">
+{#                                                   href="{% url 'blog:news_details' item.slug %}">#}
+                                                 href="{{ item.get_absolute_url }}"> 
                                                     <div class="uk-card-media-top"><img decoding="async"
                                                                                         src="
-                                                                                                {% if item.photo %}{{ item.photo.url }}{% else %}{{ page_default_img }}{% endif %}"
+                                                                                                {% if item.photo %}{{ item.photo.url }}{% else %}{% static 'images/BestCow800x450.jpg' %}{% endif %}"
                                                                                         class="el-image"
                                                                                         alt="{{ item.title }}"
                                                                                         loading="lazy" >
@@ -49,7 +51,9 @@
                                                             
                                                         </div>
                                                         <div class="el-content uk-panel uk-margin-top">
+                                                            {% autoescape off %}
                                                             {{ item.short_content|truncatechars:77 }}
+                                                            {% endautoescape %}
                                                         </div>
                                                     </div>
                                                 </a>

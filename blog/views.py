@@ -15,8 +15,8 @@ class NewsListViews(ListView):
     # template_name_suffix = '_update_form'  # добавить суфикс если такое имя есть
     # context_object_name = 'news_list'  # имя обьекта для перебора
     # extra_context = {'title' : 'Главная'} # почету то так не используют
-    page_header = 'Блог'
-    page_title = 'Блог'
+    page_header = 'Блог Аркаши'
+    page_title = 'Блог Аркаши'
     page_default_img = f'{settings.STATIC_URL}BestCow800x450.jpg'
     queryset = News.objects.filter(is_published=True).select_related('category').select_related('created_by')
 
@@ -25,7 +25,7 @@ class NewsListViews(ListView):
         context = super(NewsListViews, self).get_context_data(**kwargs)
         context['page_header'] = self.page_header
         context['page_title'] = self.page_title
-        context['page_default_img'] = self.page_default_img
+        context['page_default_img'] = self.page_default_img # если нет изобраение то это
         return context
 
 
@@ -35,7 +35,8 @@ class NewsDetailViews(DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         """ GET:param object_list::param kwargs::return:"""
         context = super(NewsDetailViews, self).get_context_data(**kwargs)
-        context['page_default_img'] = self.page_default_img
+        context['title'] = self.object.title                # получить заголовок из статьи
+        context['page_default_img'] = self.page_default_img # если нет изобраение то это
         return context
 
 

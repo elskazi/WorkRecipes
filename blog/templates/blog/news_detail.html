@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
+{%load static %}
 
 {% block title %}
     {{ object.title }} | {{ block.super }}
 {% endblock %}
+
 {% block body %}
 <main id="tm-main">
     <!-- Content -->
@@ -19,7 +21,7 @@
                             rel="tag">{{ object.category.title }}</a> </h4>
                     <div class="uk-margin">
                         <img decoding="async" 
-src="{% if object.photo %}{{ object.photo.url }}{% else %}{{ page_default_img }}{% endif %}" 
+src="{% if object.photo %}{{ object.photo.url }}{% else %}{% static 'images/BestCow800x450.jpg' %}{% endif %}" 
                              width="780"
                              class="el-image" alt="{{ object.title }}" loading="lazy">
                     </div>

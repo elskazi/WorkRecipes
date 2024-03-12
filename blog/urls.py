@@ -9,7 +9,7 @@ app_name = 'blog'
 
 urlpatterns = [
     path('', NewsListViews.as_view(), name='news_list'),
-    path('<int:pk>', NewsDetailViews.as_view(), name='news_detail'),
+    path('<str:slug>', NewsDetailViews.as_view(), name='news_details'),
     path('create/', NewsCreateViews.as_view(), name='news_create'),
     path('request/', HttpRequestPage.as_view(), name='news_request'),
 

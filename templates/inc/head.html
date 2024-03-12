@@ -5,7 +5,7 @@
         <div class="uk-container uk-container-expand">
             <nav class="uk-navbar" uk-navbar="{&quot;container&quot;:&quot;.tm-header-mobile&quot;}">
                 <div class="uk-navbar-left">
-                    <a href="#" aria-label="Вернуться на главную"
+                    <a href="{% url 'blog:news_list' %}" aria-label="Вернуться на главную"
                        class="uk-logo uk-navbar-item">
                         <img alt="Work work!" loading="eager" width="155" height="30"
                              src="{% static 'logo.svg' %}"></a>
