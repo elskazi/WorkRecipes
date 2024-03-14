@@ -8,7 +8,8 @@ from .models import News, Category
 
 class NewsListViews(ListView):
     model = News
-    paginate_by = 10
+    paginate_by = 2
+
     # template_name = 'blog/news_list.html'  # имя шаблона
     # template_name_suffix = '_update_form'  # добавить суфикс если такое имя есть
     # context_object_name = 'news_list'  # имя обьекта для перебора
@@ -54,6 +55,7 @@ class NewsByCategoryListView(ListView):
     типа кликая на категорию попадаем в список отсоритрованный по этой категории
     '''
     model = News
+    paginate_by = 2
     category = None
     # template_name = 'blog/news_list.html'     # имя шаблона
     # context_object_name = 'news_list'         # имя обьекта для перебора
