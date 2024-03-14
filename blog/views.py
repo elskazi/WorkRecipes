@@ -8,7 +8,7 @@ from .models import News, Category
 
 class NewsListViews(ListView):
     model = News
-    paginate_by = 2
+    paginate_by = 9
 
     # template_name = 'blog/news_list.html'  # имя шаблона
     # template_name_suffix = '_update_form'  # добавить суфикс если такое имя есть
@@ -54,22 +54,28 @@ class NewsByCategoryListView(ListView):
     представление для сортировки статей по категориям
     типа кликая на категорию попадаем в список отсоритрованный по этой категории
     '''
-    model = News
-    paginate_by = 2
+    #model = News
+    paginate_by = 9
     category = None
     # template_name = 'blog/news_list.html'     # имя шаблона
     # context_object_name = 'news_list'         # имя обьекта для перебора
     def get_queryset(self):
         self.category = Category.objects.get(slug=self.kwargs['slug'])      # достаем название категории слаг=слаг
-        queryset = News.objects.all().filter(category__slug=self.category.slug, is_published=True )
+        #queryset_old = News.objects.all().filter(category__slug=self.category.slug, is_published=True)
+        queryset = News.objects.filter(category__in=self.category.get_descendants(include_self=True))
         return queryset
 
+    '''Product.objects.filter(category__in=Category.objects.get(pk=2).get_descendants(include_self=True))
+    '''
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = self.category.title
         context['page_header'] = f'Статьи из категории: {self.category.title}'
         return context
 
+def side_bar_filter_category(request):
+    category_published = Category.objects.filter(is_published=True)
+    return render(request, 'blog/sidebar.html', {'category_published':category_published} )
 
 
 class HttpRequestPage(View):

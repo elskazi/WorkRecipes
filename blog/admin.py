@@ -12,12 +12,12 @@ class NewsAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(DraggableMPTTAdmin):
-    list_display = ('tree_actions', 'indented_title', 'id', 'title', 'slug',)
+    list_display = ('tree_actions', 'indented_title', 'id', 'title','is_published', 'slug',)
     list_display_links = ('id', 'title', 'slug',)
     prepopulated_fields = {'slug': ('title',)}
     save_on_top = True
     fieldsets = (
-        ('Основная инфрмация', {'fields':('title', 'slug', 'parent')}),
+        ('Основная инфрмация', {'fields':('title', 'slug', 'parent','is_published')}),
         ('Описание', {'fields': ('description',)}),
     )
 

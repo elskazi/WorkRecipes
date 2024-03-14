@@ -3,17 +3,21 @@
 {% full_tree_for_model blog.Category as categories %}
 <div class="uk-width-1-3@m uk-flex-first@s">
     <ul class="uk-list uk-list-striped">
-        {% recursetree categories %}
+        {% recursetree categories  %}  
+{#      recursetree      category_published  --or categories  #}
             <li class="el-item">
+
                 <a href="{{ node.get_absolute_url }}" uk-scroll class="uk-link-toggle">
                     <div class="uk-grid-small uk-child-width-expand uk-flex-nowrap uk-flex-middle" uk-grid>
                         <div>
-                            <div class="el-content uk-panel uk-h5"><span
-                                    class="uk-link uk-margin-remove-last-child">{{ node.title }}</span>
+                            <div class="el-content uk-panel uk-h5">
+                                <span class="uk-link uk-margin-remove-last-child">{{ node.title }}
+                                </span>
                             </div>
                             {% if not node.is_leaf_node %}
                                 <ul>{% endif %}
                             {{ children }}
+
                             {% if not node.is_leaf_node %}</ul>{% endif %}
                         </div>
                     </div>
@@ -22,3 +26,21 @@
         {% endrecursetree %}
     </ul>
 </div>
+
+{% for i in category_published %}
+    {{ i }}
+{% endfor %}
+{#<ul class="root">#}
+{#test#}
+{#{% for category in category_published %}#}
+{#    {% recursetree category_published %}#}
+{#        <li>#}
+{#            <a href="{% url 'blog:news_by_category' category.slug|slugify %}">{{ category.title }}</a>#}
+{#            {% if not node.is_leaf_node %}#}
+{#                <ul class="children">#}
+{#                    {{ children }}#}
+{#                </ul>#}
+{#            {% endif %}#}
+{#        </li>#}
+{#    {% endfor %}#}
+{#</ul>#}
