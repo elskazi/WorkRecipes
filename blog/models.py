@@ -21,7 +21,7 @@ class Category(MPTTModel):
     """
     title = models.CharField(max_length=200, verbose_name='Заголовок категории', db_index=True)
     slug = models.SlugField(max_length=255, verbose_name='URL категории', blank=True)
-    description = models.TextField(verbose_name='Описание категории', max_length=300)
+    description = models.TextField(verbose_name='Описание категории', max_length=300, blank=True)
     is_published = models.BooleanField(default=True, verbose_name='Статус')
     parent = TreeForeignKey(
         'self',
