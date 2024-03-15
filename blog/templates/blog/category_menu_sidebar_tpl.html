@@ -1,0 +1,25 @@
+{% load mptt_tags %}
+
+{% full_tree_for_model blog.Category as categories %}
+<ul class="uk-list uk-list-striped">
+    {% recursetree category_published %}
+        {# recursetree      category_published  --or categories  #}
+        <li class="el-item">
+            <a href="{{ node.get_absolute_url }}" uk-scroll class="uk-link-toggle">
+                <div class="uk-grid-small uk-child-width-expand uk-flex-nowrap uk-flex-middle" uk-grid>
+                    <div>
+                        <div class="el-content uk-panel uk-h5">
+                                <span class="uk-link uk-margin-remove-last-child">{{ node.title }}
+                                </span>
+                        </div>
+                        {% if not node.is_leaf_node %}
+                            <ul>{% endif %}
+                        {{ children }}
+
+                        {% if not node.is_leaf_node %}</ul>{% endif %}
+                    </div>
+                </div>
+            </a>
+        </li>
+    {% endrecursetree %}
+</ul>

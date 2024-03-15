@@ -16,7 +16,7 @@ class NewsListViews(ListView):
     # extra_context = {'title' : 'Главная'} # почету то так не используют
     page_header = 'Блог Аркаши'
     page_title = 'Блог Аркаши'
-    queryset = News.objects.filter(is_published=True).select_related('category').select_related('created_by')
+    queryset = News.objects.filter(is_published=True, category__is_published=True).select_related('category').select_related('created_by')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """ GET:param object_list::param kwargs::return:"""
@@ -62,7 +62,7 @@ class NewsByCategoryListView(ListView):
     def get_queryset(self):
         self.category = Category.objects.get(slug=self.kwargs['slug'])      # достаем название категории слаг=слаг
         #queryset_old = News.objects.all().filter(category__slug=self.category.slug, is_published=True)
-        queryset = News.objects.filter(category__in=self.category.get_descendants(include_self=True))
+        queryset = News.objects.filter(category__in=self.category.get_descendants(include_self=True), is_published=True, category__is_published=True).select_related('category')
         return queryset
 
     '''Product.objects.filter(category__in=Category.objects.get(pk=2).get_descendants(include_self=True))
@@ -73,9 +73,9 @@ class NewsByCategoryListView(ListView):
         context['page_header'] = f'Статьи из категории: {self.category.title}'
         return context
 
-def side_bar_filter_category(request):
-    category_published = Category.objects.filter(is_published=True)
-    return render(request, 'blog/sidebar.html', {'category_published':category_published} )
+# def side_bar_filter_category(request):
+#     category_published = Category.objects.filter(is_published=True)
+#     return render(request, 'blog/sidebar.html', {'category_published':category_published} )
 
 
 class HttpRequestPage(View):
