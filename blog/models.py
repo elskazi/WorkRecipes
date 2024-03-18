@@ -6,7 +6,7 @@ from mptt.models import MPTTModel, TreeForeignKey   # MPTT категории
 
 from django.contrib.auth import get_user_model      # model USER
 from services.utils import unique_slugify           # use my utils for slug unical
-
+from django.core.validators import FileExtensionValidator
 
 User = get_user_model()                             # use model USER
 """
@@ -84,7 +84,7 @@ class News(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создано')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Изменено')
     photo = ResizedImageField(size=[1920, 1080], crop=['middle', 'center'], upload_to='photos/%Y/%m/%d/',
-                              verbose_name='Изображение', blank=True)
+                              verbose_name='Изображение', blank=True, validators=[FileExtensionValidator(allowed_extensions=('png', 'jpg', 'jpeg'))])
     is_published = models.BooleanField(default=True, verbose_name='Статус поста')
     created_by = models.ForeignKey(User, default=1, on_delete=models.SET_DEFAULT, verbose_name='Автор',
                                    related_name='author_posts')

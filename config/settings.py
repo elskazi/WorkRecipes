@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
 
     'blog.apps.BlogConfig',
+    'system.apps.SystemConfig',
 
 ]
 
