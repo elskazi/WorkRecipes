@@ -16,7 +16,7 @@ class NewsListViews(ListView):
     # extra_context = {'title' : 'Главная'} # почету то так не используют
     page_header = 'Блог Аркаши'
     page_title = 'Блог Аркаши'
-    queryset = News.objects.filter(is_published=True, category__is_published=True).select_related('category').select_related('created_by')
+    queryset = News.objects.filter(is_published=True, category__is_published=True).select_related('category', 'created_by')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """ GET:param object_list::param kwargs::return:"""
@@ -38,7 +38,7 @@ class NewsByCategoryListView(ListView):
     def get_queryset(self):
         self.category = Category.objects.get(slug=self.kwargs['slug'])      # достаем название категории слаг=слаг
         #queryset_old = News.objects.all().filter(category__slug=self.category.slug, is_published=True)
-        queryset = News.objects.filter(is_published=True, category__in=self.category.get_descendants(include_self=True), category__is_published=True).select_related('category').select_related('created_by')
+        queryset = News.objects.filter(is_published=True, category__in=self.category.get_descendants(include_self=True), category__is_published=True).select_related('category', 'created_by')
         return queryset
 
     def get_context_data(self, **kwargs):
