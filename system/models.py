@@ -5,7 +5,7 @@ from django.urls import  reverse
 from datetime import date, timedelta
 from django.db.models.signals import post_save  # сигналы
 from django.dispatch import receiver            # сигналы
-
+from django_resized import ResizedImageField        # resizer image
 
 
 from services.utils import unique_slugify
@@ -16,7 +16,9 @@ User = get_user_model()
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     slug = models.SlugField(verbose_name='URL', max_length=255, blank=True, unique=True)
-    avatar = models.ImageField(verbose_name='Аватар',
+    avatar = ResizedImageField(size=[230, 230],
+                               crop=['middle', 'center'],
+                               verbose_name='Аватар',
                                upload_to='avatars/%Y/%m/%d/',
                                #default='avatars/default.png',
                                blank=True,
