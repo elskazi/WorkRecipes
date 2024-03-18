@@ -60,6 +60,23 @@ class News(models.Model):
     Модель постов для сайта
     """
 
+    class NewsManager(models.Manager):
+        """
+        Кастомный менеджер для модели статей
+        """
+
+        def all(self):
+            """
+            Список статей (SQL запрос с фильтрацией для страницы списка статей)
+            не очнь подходит, для данной цели, используем queryset = News.customNewsManager.all()
+            так как функция all()  и надо использовать без filters
+            """
+            return self.get_queryset().filter(is_published=True)
+    ''' выключил его нахер, так как можно запустаться в запросах в представлении 
+    наже переопределяем objects на customNewsManager'''
+    #customNewsManager = NewsManager()   #  переопределяем objects на customNewsManager
+
+
     title = models.CharField(max_length=200, verbose_name='Заголовок')
     slug = models.SlugField(verbose_name='URL', max_length=255, blank=True, unique=True)
     short_content = CKEditor5Field(blank=True, verbose_name='Краткое описание', max_length=500)
@@ -76,6 +93,8 @@ class News(models.Model):
                                 related_name='updater_posts', blank=True)
     fixed = models.BooleanField(verbose_name='Зафиксировано', default=False)
     views = models.IntegerField(default=0, verbose_name='Просмотры', )
+
+
 
     class Meta:
         verbose_name = 'Новость'  # Имя модели в единственном числе

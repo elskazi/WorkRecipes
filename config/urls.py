@@ -11,5 +11,11 @@ urlpatterns = [
     path('', include('blog.urls'))
 ]
 if settings.DEBUG:
-    """Подключение статики и медиа."""
+    """Подключение статики и медиа. вариант +=  И  .extend """
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns.extend(
+        static(settings.STATIC_URL, document_root=settings.STATIC_URL)
+    )
+    urlpatterns.append(
+        path('__debug__/', include('debug_toolbar.urls'))
+    )

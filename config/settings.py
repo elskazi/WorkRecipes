@@ -5,6 +5,7 @@ pip install django-resized  Изменяет размер и качество и
 pip install django-ckeditor-5
 pip install django-mptt     МРТТ категории вложенные (можно одну категория вклыдвать в другую категорию)
 pip install pytils          сохранения уникального slug https://proghunter.ru/articles/django-base-2023-automatic-slug-generation-cyrillic-handling-in-django-9
+pip install django-debug-toolbar    INSATALL- 'debug_toolbar'  middleware - 'debug_toolbar.middleware.DebugToolbarMiddleware'
 
 """
 
@@ -23,7 +24,10 @@ SECRET_KEY = 'django-insecure-u755mln2j*cu^md5s2-_je4vnx6&o%$$=soz0!m3+-o(vkbqx+
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+INTERNAL_IPS = [        # for use debug toold bar
+    '127.0.0.1',
+    'localhost'
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -34,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'debug_toolbar',
     'mptt',                 # MPTT вложенные категории
     'django_ckeditor_5',
     'services' ,             # folder for utils
@@ -51,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'
