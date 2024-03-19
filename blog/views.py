@@ -3,8 +3,9 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import News, Category
+from .forms import NewsCreateForm, NewsUpdateForm
 
 class NewsListViews(ListView):
     model = News
@@ -51,19 +52,21 @@ class NewsByCategoryListView(ListView):
 class NewsDetailViews(DetailView):
     """Детали статьи"""
     model = News
+
     def get_context_data(self, *, object_list=None, **kwargs):
         """ GET:param object_list::param kwargs::return:"""
         context = super(NewsDetailViews, self).get_context_data(**kwargs)
-        context['title'] = self.object.title     # получить заголовок, ЗАЧЕМ? если может из обьекта, не исплольз
+        #context['title'] = self.object.title     # получить заголовок, ЗАЧЕМ? если может из обьекта, не исплольз
         return context
 
 
 class NewsCreateViews(CreateView):
     model = News
-    fields = 'title', 'content', 'photo', 'is_published', 'category', 'created_by'
-    success_url = reverse_lazy('blog:news_list')
-    page_header = 'Новая запись'
-    page_title = 'Новая запись'
+    #fields = 'title', 'content', 'photo', 'is_published', 'category', 'created_by' # используем NewsCreateForm
+    form_class = NewsCreateForm
+    #success_url = reverse_lazy('blog:news_list')           к# без этого перенаправит на созданную статью
+    page_header = 'Добавление новой записи'
+    page_title = 'Добавление новой записи'
 
     def get_context_data(self, **kwargs):
         context = super(NewsCreateViews, self).get_context_data(**kwargs)
@@ -71,7 +74,53 @@ class NewsCreateViews(CreateView):
         context['page_title'] = self.page_title
         return context
 
+    def form_valid(self, form):
+        '''В методе form_valid() валидируем нашу форму,
+        а также сохраняем автором текущего пользователя на странице,
+        которого получаем из запроса self.request.user'''
+        form.instance.author = self.request.user
+        form.save()
+        return super().form_valid(form)
 
+
+class NewsUpdateView(UpdateView):
+    """
+    Представление: обновления материала на сайте
+    """
+    model = News
+    page_header = 'Обновление записи: '
+    page_title = 'Обновление записи: '
+    form_class = NewsUpdateForm
+    #template_name = 'blog/articles_update.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #context['title'] = f'Обновление статьи: {self.object.title}'
+        context['page_header'] = f'{self.page_header} {self.object.title}'
+        context['page_title'] = f'{self.page_header} {self.object.title}'
+        return context
+
+    def form_valid(self, form):
+        # form.instance.updater = self.request.user # убрана для возможности получения пользователя для обновления
+        form.save()
+        return super().form_valid(form)
+
+class NewsDeleteView(DeleteView):
+    """
+    Представление: удаления материала
+    """
+    model = News
+    success_url = reverse_lazy('blog:news_list')
+    #context_object_name = 'article'
+    #template_name = 'blog/news_confirm_delete.html' # по дефолту
+    page_header = 'Удаление записи: '
+    page_title = 'Удаление записи: '
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_header'] = f'{self.page_header} {self.object.title}'
+        context['page_title'] = f'{self.page_header} {self.object.title}'
+        return context
 
 
 class HttpRequestPage(View):
