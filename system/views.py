@@ -1,12 +1,13 @@
-from django.views.generic import DetailView, UpdateView, ListView
+from django.views.generic import DetailView, UpdateView, ListView, CreateView
 from django.db import transaction
 from django.urls import reverse_lazy
-from django.contrib.auth import get_user_model      # model USER
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.messages.views import SuccessMessageMixin
 
 from .models import Profile
-from .forms import UserUpdateForm, ProfileUpdateForm
+from .forms import UserUpdateForm, ProfileUpdateForm, UserRegisterForm, UserLoginForm
 
-User = get_user_model()                             # use model USER
+                           # use model USER
 """
 о get_user_model() по ссылке
 # https://proghunter.ru/articles/django-base-2023-building-a-module-blog-and-model-articles-2
@@ -69,3 +70,38 @@ class ProfileUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('profile_detail', kwargs={'slug': self.object.slug})
+
+
+class UserRegisterView(SuccessMessageMixin, CreateView):
+    """
+    Представление регистрации на сайте с формой регистрации
+    """
+    form_class = UserRegisterForm
+    success_url = reverse_lazy('home')
+    template_name = 'system/user_register.html'
+    success_message = 'Вы успешно зарегистрировались. Можете войти на сайт!'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Регистрация на сайте'
+        return context
+
+class UserLoginView(SuccessMessageMixin, LoginView):
+    """
+    Авторизация на сайте
+    """
+    form_class = UserLoginForm
+    template_name = 'system/user_login.html'
+    next_page = reverse_lazy('system:profile_list')         # изменить  на профайл
+    success_message = 'Добро пожаловать на сайт!'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Авторизация на сайте'
+        return context
+
+class UserLogoutView(LogoutView):
+    """
+    Выход с сайта
+    """
+    next_page = reverse_lazy('blog:news_list')

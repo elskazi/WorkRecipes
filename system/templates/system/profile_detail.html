@@ -25,7 +25,9 @@
                             <li>Дата рождения: {{ profile.birth_date }}</li>
                             <li>О себе: {{ profile.bio }}</li>
                         </ul>
+                    {% if request.profile.user.is_staff or request.profile.user.slug == profile.user.slug %}
                     <a href="{% url 'system:profile_edit' %}" class="btn btn-sm btn-primary">Редактировать профиль</a>
+                    {% endif %}
                     </div>
                 </div>
             </div>
