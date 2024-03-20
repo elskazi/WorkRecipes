@@ -4,8 +4,13 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+
+from django.contrib.auth.mixins import LoginRequiredMixin       # разрешение, надо сделать авторизацию авторизацию
+from django.contrib.messages.views import SuccessMessageMixin   # Миксин уведомления, отправляет сообщение в шаблон
+from services.mixins import AuthorRequiredMixin                 # Миксин редактирования статьи только автор
 from .models import News, Category
 from .forms import NewsCreateForm, NewsUpdateForm
+
 
 class NewsListViews(ListView):
     model = News
@@ -38,7 +43,7 @@ class NewsByCategoryListView(ListView):
     # context_object_name = 'news_list'         # имя обьекта для перебора
     def get_queryset(self):
         self.category = Category.objects.get(slug=self.kwargs['slug'])      # достаем название категории слаг=слаг
-        #queryset_old = News.objects.all().filter(category__slug=self.category.slug, is_published=True)
+        # вытащить категорию и ее дочении категории -   category__in=self.category.get_descendants(include_self=True)
         queryset = News.objects.filter(is_published=True, category__in=self.category.get_descendants(include_self=True), category__is_published=True).select_related('category', 'created_by')
         return queryset
 
@@ -60,13 +65,16 @@ class NewsDetailViews(DetailView):
         return context
 
 
-class NewsCreateViews(CreateView):
+class NewsCreateViews(LoginRequiredMixin, CreateView):
     model = News
-    #fields = 'title', 'content', 'photo', 'is_published', 'category', 'created_by' # используем NewsCreateForm
-    form_class = NewsCreateForm
-    #success_url = reverse_lazy('blog:news_list')           к# без этого перенаправит на созданную статью
+    form_class = NewsCreateForm                             # если б не использовали forms.py то надо прописать fields
+    #fields = 'title', 'content', 'photo', ...              # используем NewsCreateForm
+    #success_url = reverse_lazy('blog:news_list')           # без этого перенаправит на созданную статью
+    #login_url = reverse_lazy("blog:news_request")          # куда перекинуть после авторизации, пропискано в настройках
+    #template_name = 'blog/news_form.html'                  # форма по умолчанию
     page_header = 'Добавление новой записи'
     page_title = 'Добавление новой записи'
+
 
     def get_context_data(self, **kwargs):
         context = super(NewsCreateViews, self).get_context_data(**kwargs)
@@ -83,15 +91,16 @@ class NewsCreateViews(CreateView):
         return super().form_valid(form)
 
 
-class NewsUpdateView(UpdateView):
+class NewsUpdateView(AuthorRequiredMixin, SuccessMessageMixin, UpdateView):
     """
     Представление: обновления материала на сайте
     """
     model = News
+    form_class = NewsUpdateForm
+    success_message = 'Материал был успешно обновлен'       # в шаблоне прописать {% if messages %} ...
     page_header = 'Обновление записи: '
     page_title = 'Обновление записи: '
-    form_class = NewsUpdateForm
-    #template_name = 'blog/articles_update.html'
+    #template_name = 'blog/news_form.html'                  # форма по умолчанию
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -105,7 +114,7 @@ class NewsUpdateView(UpdateView):
         form.save()
         return super().form_valid(form)
 
-class NewsDeleteView(DeleteView):
+class NewsDeleteView(AuthorRequiredMixin, DeleteView):
     """
     Представление: удаления материала
     """

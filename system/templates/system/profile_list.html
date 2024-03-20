@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    User list | {{ block.super }}
+{% endblock %}
+
+{% block body %}
+
+   <h1>User list</h1>
+    {% for profile in object_list %}
+        <p><a href="{% url 'system:profile_detail' slug=profile.slug %}">{{ profile.pk }} | {{ profile.user.username }}</a></p>
+{#        <p><a href="{% url 'myauth:user_detail' pk=user.pk %}">{{ user.username }} | {{ user.email }} </a></p>#}
+    {% endfor %}
+
+{% endblock %}

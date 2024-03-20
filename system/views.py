@@ -1,9 +1,21 @@
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView, UpdateView, ListView
 from django.db import transaction
 from django.urls import reverse_lazy
+from django.contrib.auth import get_user_model      # model USER
 
 from .models import Profile
 from .forms import UserUpdateForm, ProfileUpdateForm
+
+User = get_user_model()                             # use model USER
+"""
+о get_user_model() по ссылке
+# https://proghunter.ru/articles/django-base-2023-building-a-module-blog-and-model-articles-2
+"""
+
+class ProfileListView(ListView):
+    #model = Profile
+    template_name = 'system/profile_list.html'
+    queryset = Profile.objects.all().select_related('user')
 
 
 class ProfileDetailView(DetailView):

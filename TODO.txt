@@ -1,12 +1,35 @@
 
-Поставить debug_toolbar, отследить сколько запросов без
-- News.objects.filter(is_published=True).select_related('category').select_related('created_by')
-Пользователи
-Тэги
-готово - Изображния, уменьшение, ссылка
-Редоктор кода
-Вместо удаления архививрование через сайт, бруд есть опубликовано!
 
+
+Пользователи (готово только на просмотр , сделать регистрацию)
+Тэги
+Вместо удаления архививрование через сайт, бред есть опубликовано!  Не бред сделать
+
+
+
+
+
+
+
+Смотеть измения в ГИТЕ!!!!
+бред тут писать тоже самое
+
+20-03-2024 -
+12-03-2024
+Профиль пользователя только модель, редактирование и просмотр
+Mixins - авторизации для создания
+CRUD - готово
+Paganition постраничная навигация
+include tags для категорий (MPTT)
+pip install django-resized  Изменяет размер и качество избражения https://github.com/un1t/django-resized
+pip install django-ckeditor-5
+pip install django-mptt     МРТТ категории вложенные (можно одну категория вклыдвать в другую категорию)
+pip install pytils          сохранения уникального slug https://proghunter.ru/articles/django-base-2023-automatic-slug-generation-cyrillic-handling-in-django-9
+pip install django-debug-toolbar    INSATALL- 'debug_toolbar'  middleware - 'debug_toolbar.middleware.DebugToolbarMiddleware'
+
+Поставить debug_toolbar, отследить сколько запросов без - готово
+Изображния, уменьшение, ссылка - готово
+Редоктор кода - готово
 
 02-02-2024
 Статические фалы, логотип и изобр по умолчанию перенес в статику

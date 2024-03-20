@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}
+    {{ profile.user.username }} | {{ block.super }}
+{% endblock %}
 
 {% block body %}
 <div class="card mb-3 border-0 nth-shadow">

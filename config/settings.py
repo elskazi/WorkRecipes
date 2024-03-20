@@ -12,6 +12,8 @@ pip install django-debug-toolbar    INSATALL- 'debug_toolbar'  middleware - 'deb
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.urls import reverse_lazy
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -130,6 +132,9 @@ MEDIA_URL = '/media/'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_REDIRECT_URL = reverse_lazy("blog:news_list")     # когда вошел, куда перекинуть, обычно профайл Юзера
+LOGIN_URL = reverse_lazy("blog:news_list")                # перенаправлять для ВХОДА, обычно страница Логин
 
 # Ресайз изображений при закгрузке
 # https://github.com/un1t/django-resized
