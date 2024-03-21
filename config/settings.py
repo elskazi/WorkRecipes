@@ -135,6 +135,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = reverse_lazy("blog:news_list")     # когда вошел, куда перекинуть, обычно профайл Юзера
 LOGIN_URL = reverse_lazy("blog:news_list")                # перенаправлять для ВХОДА, обычно страница Логин
+LOGOUT_REDIRECT_URL = reverse_lazy("system:logout")
 
 # Ресайз изображений при закгрузке
 # https://github.com/un1t/django-resized

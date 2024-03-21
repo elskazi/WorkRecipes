@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
+
 {% block title %}
     {{ profile.user.username }} | {{ block.super }}
 {% endblock %}
 
 {% block body %}
+    {% if user.is_authenticated %}
 <div class="card mb-3 border-0 nth-shadow">
    <div class="card-body">
+       <h1>{{ page_title }}</h1>
       <div class="card-title nth-card-title">
          <h4>Изменение профиля</h4>
       </div>
@@ -19,4 +22,7 @@
       </form>
    </div>
 </div>
+    {% else %}
+        <h1>User is anonymous</h1>
+    {% endif %}
 {% endblock %}

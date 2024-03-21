@@ -5,29 +5,45 @@
 
 
 {% block body %}
-<div class="card border-0">
+    <div class="card border-0">
         <div class="card-body">
+            <h1>{{ page_title }}</h1>
             <div class="row">
                 <div class="col-md-3">
                     <figure>
-                        <img src="{{ profile.get_avatar }}" class="img-fluid rounded-0" alt="{{ profile }}" width="230px">
+                        <img src="{{ profile.get_avatar }}" class="img-fluid rounded-0" alt="{{ profile }}"
+                             width="230px">
                     </figure>
                 </div>
                 <div class="col-md-9">
-                     <h5 class="card-title">
-                        {{ profile }}
-                    </h5>
+
                     <div class="card-text">
                         <ul>
                             <li>Никнейм: {{ profile.user.username }}</li>
-                            {% if profile.user.get_full_name %} <li>Имя и фамилия: {{ profile.user.get_full_name }}</li> {% endif %}
+                            {% if profile.user.get_full_name %}
+                                <li>Имя и фамилия: {{ profile.user.get_full_name }}</li>
+                            {% endif %}
                             <li>Заходил: {{ profile.user.last_login }}</li>
                             <li>Дата рождения: {{ profile.birth_date }}</li>
                             <li>О себе: {{ profile.bio }}</li>
                         </ul>
-                    {% if request.profile.user.is_staff or request.profile.user.slug == profile.user.slug %}
-                    <a href="{% url 'system:profile_edit' %}" class="btn btn-sm btn-primary">Редактировать профиль</a>
-                    {% endif %}
+
+
+{# проверка SLUG     #}
+{# {{ request.user.profile.slug }} <br> #}
+{# {{ user.profile.slug }} <br> {{ profile.slug  }}#}
+
+                        {% if request.user.is_staff or request.user.profile.slug == profile.slug %}
+                            {# Разрешено стаффу или под текущим пользователе #}
+                            <p>
+                                <a href="{% url 'system:profile_edit' %}" class="btn btn-sm btn-primary">Редактировать
+                                    профиль</a>
+                            </p>
+                            <p>
+                                <a href="{% url 'system:password_change' %}" class="btn btn-sm btn-primary">Сменить
+                                    пароль</a>
+                            </p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

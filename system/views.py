@@ -3,18 +3,22 @@ from django.db import transaction
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
-
+from django.contrib.auth.views import PasswordChangeView  # изменение пароля
 from .models import Profile
-from .forms import UserUpdateForm, ProfileUpdateForm, UserRegisterForm, UserLoginForm
+from .forms import UserUpdateForm, ProfileUpdateForm, UserRegisterForm, UserLoginForm, UserPasswordChangeForm
 
-                           # use model USER
+# use model USER
 """
 о get_user_model() по ссылке
 # https://proghunter.ru/articles/django-base-2023-building-a-module-blog-and-model-articles-2
 """
 
+
 class ProfileListView(ListView):
-    #model = Profile
+    """
+    Представление для  списка профилей
+    """
+    # model = Profile
     template_name = 'system/profile_list.html'
     queryset = Profile.objects.all().select_related('user')
 
@@ -29,7 +33,7 @@ class ProfileDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Страница пользователя: {self.object.user.username}'
+        context['page_title'] = f'Страница пользователя: {self.object.user.username}'
         return context
 
 
@@ -48,7 +52,7 @@ class ProfileUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = f'Редактирование профиля пользователя: {self.request.user.username}'
+        context['page_title'] = f'Редактирование профиля пользователя: {self.request.user.username}'
         if self.request.POST:
             context['user_form'] = UserUpdateForm(self.request.POST, instance=self.request.user)
         else:
@@ -69,7 +73,7 @@ class ProfileUpdateView(UpdateView):
         return super(ProfileUpdateView, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('profile_detail', kwargs={'slug': self.object.slug})
+        return reverse_lazy('system:profile_detail', kwargs={'slug': self.object.slug})
 
 
 class UserRegisterView(SuccessMessageMixin, CreateView):
@@ -77,7 +81,7 @@ class UserRegisterView(SuccessMessageMixin, CreateView):
     Представление регистрации на сайте с формой регистрации
     """
     form_class = UserRegisterForm
-    success_url = reverse_lazy('home')
+    #success_url = reverse_lazy('home')
     template_name = 'system/user_register.html'
     success_message = 'Вы успешно зарегистрировались. Можете войти на сайт!'
 
@@ -86,13 +90,14 @@ class UserRegisterView(SuccessMessageMixin, CreateView):
         context['page_title'] = 'Регистрация на сайте'
         return context
 
+
 class UserLoginView(SuccessMessageMixin, LoginView):
     """
     Авторизация на сайте
     """
     form_class = UserLoginForm
     template_name = 'system/user_login.html'
-    next_page = reverse_lazy('system:profile_list')         # изменить  на профайл
+    next_page = reverse_lazy('system:profile_list')  # изменить  на профайл
     success_message = 'Добро пожаловать на сайт!'
 
     def get_context_data(self, **kwargs):
@@ -100,8 +105,27 @@ class UserLoginView(SuccessMessageMixin, LoginView):
         context['page_title'] = 'Авторизация на сайте'
         return context
 
-class UserLogoutView(LogoutView):
+
+class UserLogoutView(SuccessMessageMixin, LogoutView):
     """
     Выход с сайта
     """
     next_page = reverse_lazy('blog:news_list')
+    success_message = 'Вы вышли из учётной записи.'
+
+
+class UserPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
+    """
+    Изменение пароля пользователя
+    """
+    form_class = UserPasswordChangeForm
+    template_name = 'system/user_password_change.html'
+    success_message = 'Ваш пароль был успешно изменён!'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Изменение пароля на сайте'
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('system:profile_detail', kwargs={'slug': self.request.user.profile.slug})

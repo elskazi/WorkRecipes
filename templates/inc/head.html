@@ -1,4 +1,4 @@
-{%load static %}
+{% load static %}
 <!-- Мобила -->
 <header class="tm-header-mobile uk-hidden@m" uk-header>
     <div class="uk-navbar-container">
@@ -19,7 +19,7 @@
         </div>
     </div>
 
-
+    {# --------------- mobile start ---------------#}
     <div id="tm-dialog-mobile" uk-offcanvas="container: true; overlay: true" mode="slide" flip>
         <div class="uk-offcanvas-bar uk-flex uk-flex-column">
             <button class="uk-offcanvas-close uk-close-large" type="button" uk-close
@@ -44,8 +44,8 @@
         </div>
     </div>
 </header>
-
-<!-- Desktop -->
+{# --------------- mobile end  ---------------#}
+{# --------------- Desktop start ---------------#}
 <header class="tm-header uk-visible@m" uk-header>
     <div class="uk-navbar-container">
         <div class="uk-container">
@@ -62,11 +62,11 @@
                         <li class="menu-item  menu-item-home 
                                         {% if request.resolver_match.url_name == "news_list" %}uk-active{% endif %} ">
                             <a href="{% url 'blog:news_list' %}">Главная</a></li>
-                    
+
                         <li class="menu-item 
                                     {% if request.resolver_match.url_name == "news_create" %}uk-active{% endif %}"><a
                                 href="{% url 'blog:news_create' %}">Добавить</a></li>
-                    
+
                         <li class="menu-item 
 {% if request.resolver_match.url_name == "news_request" %}uk-active{% endif %}"><a
                                 href="{% url 'blog:news_request' %}">Запросы</a></li>
@@ -79,16 +79,58 @@
                             <div class="uk-width-1-1">
                                 <div class="uk-margin">
                                     <div class="uk-flex-middle uk-grid-small uk-child-width-auto uk-grid" uk-grid>
-                                        <div class="el-item uk-first-column">
-                                            <a class="el-content " href="#" uk-scroll>
-                                                <b>Войти</b>
-                                            </a>
-                                        </div>
-                                        <div class="el-item">
-                                            <a class="el-content uk-button uk-button-primary" href="#" uk-scroll>
-                                                Регистрация
-                                            </a>
-                                        </div>
+
+
+                                        {% if not user.is_authenticated %}
+                                            {# если НЕ авторизован #}
+                                            <div class="el-item uk-first-column">
+                                                <a class="el-content " href="{% url 'system:login' %}" uk-scroll>
+                                                    <b>Войти</b>
+                                                </a>
+                                            </div>
+                                            <div class="el-item">
+                                                <a class="el-content uk-button uk-button-primary"
+                                                   href="{% url 'system:register' %}" uk-scroll>
+                                                    Регистрация
+                                                </a>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if user.is_authenticated %}
+                                            {# если авторизован #}
+                                            <div class="el-item uk-first-column">
+                                                <a class="el-content " href="{% url 'system:profile_detail' slug=user.profile.slug %}" uk-scroll>
+                                                <b>Профиль: {{ user.username }}</b>
+                                                </a>
+                                            </div>
+
+                                            <div class="el-item">
+                                                <a class="el-content " href="{% url 'system:profile_edit'%}" uk-scroll>
+                                                <b>Изменить</b>
+                                                </a>
+                                            </div>
+                                            <div class="el-item">
+                                                <a class="el-content " href="{% url 'system:profile_list'%}" uk-scroll>
+                                                <b>Список</b>
+                                                </a>
+                                            </div>
+                                            <div class="el-item">
+                                                <a class="el-content " href="{% url 'system:password_change'%}" uk-scroll>
+                                                <b>Пароль</b>
+                                                </a>
+                                            </div>
+
+                                            {# выход надо через форму Django 5 #}
+                                            <div class="el-item ">
+                                                <form action="{% url 'system:logout' %}" method="post">
+                                                    {% csrf_token %}
+                                                    <button class="el-content uk-button uk-button-link" type="submit">
+                                                        Log out
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        {% endif %}
+
                                     </div>
                                 </div>
                             </div>
@@ -99,3 +141,4 @@
         </div>
     </div>
 </header>
+{# --------------- Desktop end ---------------#}

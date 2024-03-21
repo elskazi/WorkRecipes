@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 
 class AuthorRequiredMixin(AccessMixin):
     """
+    Проверка Автора статьи или это стафф
     создали миксин наследуясь от основного AccessMixin и добавили возможность редактирования статьи только автору
     """
     def dispatch(self, request, *args, **kwargs):
@@ -13,5 +14,5 @@ class AuthorRequiredMixin(AccessMixin):
         if request.user.is_authenticated:
             if request.user != self.get_object().author or request.user.is_staff:
                 messages.info(request, 'Изменение и удаление статьи доступно только автору')
-                return redirect('home')
+                return redirect('blog:news_list')
         return super().dispatch(request, *args, **kwargs)

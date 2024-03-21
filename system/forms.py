@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm      # регистрации
 from django.contrib.auth.forms import AuthenticationForm    # авторизация
+from django.contrib.auth.forms import SetPasswordForm       # восстановление пароля
 from .models import Profile
 
 ''' 
@@ -107,6 +108,24 @@ class UserLoginForm(AuthenticationForm):
             self.fields['username'].widget.attrs['placeholder'] = 'Логин пользователя'
             self.fields['password'].widget.attrs['placeholder'] = 'Пароль пользователя'
             self.fields['username'].label = 'Логин'
+            self.fields[field].widget.attrs.update({
+                'class': 'uk-form-control',
+                'autocomplete': 'off'
+            })
+
+
+class UserPasswordChangeForm(SetPasswordForm):
+    """
+    Форма изменения пароля
+    В примере выше мы наследуемся уже от существующей формы в Django: SetPasswordForm.
+    Добавляем лишь стили под Bootstrap по необходимости.
+    """
+    def __init__(self, *args, **kwargs):
+        """
+        Обновление стилей формы
+        """
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
             self.fields[field].widget.attrs.update({
                 'class': 'uk-form-control',
                 'autocomplete': 'off'

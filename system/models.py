@@ -13,15 +13,23 @@ from services.utils import unique_slugify
 User = get_user_model()
 
 
+def avater_dir_path(instanse: 'User', filename: str) -> str :
+    return 'user/{pk}_{username}/{filename}'.format(
+        pk= instanse.user.pk,
+        username = instanse.user.username,
+        filename = filename,
+    )
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     slug = models.SlugField(verbose_name='URL', max_length=255, blank=True, unique=True)
     avatar = ResizedImageField(size=[230, 230],
                                crop=['middle', 'center'],
                                verbose_name='Аватар',
-                               upload_to='avatars/%Y/%m/%d/',
+                               upload_to=avater_dir_path,
                                #default='avatars/default.png',
                                blank=True,
+                               null=True,
                                validators=[FileExtensionValidator(allowed_extensions=('png', 'jpg', 'jpeg'))])
     bio = models.TextField(max_length=500, blank=True, verbose_name='Информация о себе')
     birth_date = models.DateField(null=True, blank=True, verbose_name='Дата рождения')
