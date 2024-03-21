@@ -53,11 +53,16 @@ class ProfileUpdateView(UserPassesTestMixin, UpdateView):
     #     return self.request.user.profile
 
     def test_func(self):
-        # проверяет это стаф или текущий юзер (для редактирования профиля) /user/NAME/NOT self.user = 403
-        if self.request.user.is_staff or self.request.user.profile.slug == self.get_object().slug:
-            return True
+        # проверяем вначале юзер авторизован или нет
+        if self.request.user.is_authenticated:
+            # проверяет это стаф или текущий юзер (для редактирования профиля) /user/NAME/NOT self.user = 403
+            if self.request.user.is_staff or self.request.user.profile.slug == self.get_object().slug:
+                return True
+            else:
+                return False
         else:
             return False
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -106,7 +111,7 @@ class UserLoginView(SuccessMessageMixin, LoginView):
     """
     form_class = UserLoginForm
     template_name = 'system/user_login.html'
-    next_page = reverse_lazy('system:profile_list')  # изменить  на профайл
+    next_page = reverse_lazy('blog:news_list')  # изменить  на профайл
     success_message = 'Добро пожаловать на сайт!'
 
     def get_context_data(self, **kwargs):
