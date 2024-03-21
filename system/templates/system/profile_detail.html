@@ -36,7 +36,7 @@
                         {% if request.user.is_staff or request.user.profile.slug == profile.slug %}
                             {# Разрешено стаффу или под текущим пользователе #}
                             <p>
-                                <a href="{% url 'system:profile_edit' %}" class="btn btn-sm btn-primary">Редактировать
+                                <a href="{% url 'system:profile_edit' slug=profile.slug %}" class="btn btn-sm btn-primary">Редактировать
                                     профиль</a>
                             </p>
                             <p>

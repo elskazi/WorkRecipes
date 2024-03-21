@@ -1,9 +1,11 @@
+
 from django.views.generic import DetailView, UpdateView, ListView, CreateView
 from django.db import transaction
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.views import PasswordChangeView  # изменение пароля
+from django.contrib.auth.mixins import UserPassesTestMixin  # тест на изменение профиля
+from django.contrib.auth.views import PasswordChangeView    # изменение пароля
 from .models import Profile
 from .forms import UserUpdateForm, ProfileUpdateForm, UserRegisterForm, UserLoginForm, UserPasswordChangeForm
 
@@ -37,7 +39,7 @@ class ProfileDetailView(DetailView):
         return context
 
 
-class ProfileUpdateView(UpdateView):
+class ProfileUpdateView(UserPassesTestMixin, UpdateView):
     """
     Представление для редактирования профиля
     """
@@ -45,10 +47,17 @@ class ProfileUpdateView(UpdateView):
     form_class = ProfileUpdateForm
     template_name = 'system/profile_edit.html'
 
-    def get_object(self, queryset=None):
-        ''' В методе get_object() мы передаем текущего пользователя, чтобы не редактировать чужие профили.
-        В контексте мы добавляем форму пользователя, где ссылаемся на текущего пользователя.'''
-        return self.request.user.profile
+    # def get_object(self, queryset=None):
+    #     ''' В методе get_object() мы передаем текущего пользователя, чтобы не редактировать чужие профили.
+    #     В контексте мы добавляем форму пользователя, где ссылаемся на текущего пользователя.'''
+    #     return self.request.user.profile
+
+    def test_func(self):
+        # проверяет это стаф или текущий юзер (для редактирования профиля) /user/NAME/NOT self.user = 403
+        if self.request.user.is_staff or self.request.user.profile.slug == self.get_object().slug:
+            return True
+        else:
+            return False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -73,7 +82,7 @@ class ProfileUpdateView(UpdateView):
         return super(ProfileUpdateView, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('system:profile_detail', kwargs={'slug': self.object.slug})
+        return reverse('system:profile_detail', kwargs={'slug': self.object.slug})
 
 
 class UserRegisterView(SuccessMessageMixin, CreateView):

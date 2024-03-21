@@ -105,7 +105,7 @@
                                             </div>
 
                                             <div class="el-item">
-                                                <a class="el-content " href="{% url 'system:profile_edit'%}" uk-scroll>
+                                                <a class="el-content " href="{% url 'system:profile_edit' slug=user.profile.slug %}" uk-scroll>
                                                 <b>Изменить</b>
                                                 </a>
                                             </div>
