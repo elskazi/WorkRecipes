@@ -150,14 +150,17 @@ DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
 
 # YANDEX MAIL Шестерня- Все настройки - Почтовые программы - Разрешить доступ к почтовому ящику с помощью почтовых клиентов
 # С сервера imap.yandex.ru по протоколу IMAP
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # для реальной отправки
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # для консоли
-EMAIL_HOST = 'mail.btrussia.com'  # 'mail.btrussia.ru' #'mail.btrussia.com'    'smtp.yandex.ru'
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # для реальной отправки
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # для консоли
+EMAIL_HOST = 'smtp.yandex.ru'  # 'mail.btrussia.ru' #'mail.btrussia.com'    'smtp.yandex.ru'
 EMAIL_PORT = 465  # 25
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True  # True
-EMAIL_HOST_USER = 'info@btrussia.com'  # 'elskazi@yandex.ru'
-EMAIL_HOST_PASSWORD = '5861367superPUp@rPa33'  # 'sgvmgfsvrvzobjev'
+EMAIL_HOST_USER = 'elskazi@yandex.ru'
+EMAIL_HOST_PASSWORD = 'tasgctausctqfrnf'
+EMAIL_SERVER = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = ['elskazii@yandex.ru']
 
 
 # Настройки тектового редактора
