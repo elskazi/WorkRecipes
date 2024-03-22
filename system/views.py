@@ -4,16 +4,12 @@ from django.db import transaction
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.mixins import UserPassesTestMixin  # тест на изменение профиля
-from django.contrib.auth.views import PasswordChangeView    # изменение пароля
+from django.contrib.auth.mixins import UserPassesTestMixin                              # тест на изменение профиля
+from django.contrib.auth.views import (PasswordChangeView, PasswordResetConfirmView,
+                                       PasswordResetView )     # изм/восст пароля
 from .models import Profile
-from .forms import UserUpdateForm, ProfileUpdateForm, UserRegisterForm, UserLoginForm, UserPasswordChangeForm
-
-# use model USER
-"""
-о get_user_model() по ссылке
-# https://proghunter.ru/articles/django-base-2023-building-a-module-blog-and-model-articles-2
-"""
+from .forms import (UserUpdateForm, ProfileUpdateForm, UserRegisterForm, UserLoginForm,
+                    UserPasswordChangeForm, UserForgotPasswordForm, UserSetNewPasswordForm)
 
 
 class ProfileListView(ListView):
@@ -127,10 +123,10 @@ class UserLogoutView(SuccessMessageMixin, LogoutView):
     next_page = reverse_lazy('blog:news_list')
     success_message = 'Вы вышли из учётной записи.'
 
-
+# далее игра с паролями
 class UserPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
     """
-    Изменение пароля пользователя
+    Изменение пароля пользователя (когда уже сделана авторизация)
     """
     form_class = UserPasswordChangeForm
     template_name = 'system/user_password_change.html'
@@ -143,3 +139,35 @@ class UserPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
 
     def get_success_url(self):
         return reverse_lazy('system:profile_detail', kwargs={'slug': self.request.user.profile.slug})
+
+
+class UserForgotPasswordView(SuccessMessageMixin, PasswordResetView):
+    """
+    Представление по сбросу пароля по почте
+    """
+    form_class = UserForgotPasswordForm
+    template_name = 'system/user_password_reset.html'
+    success_url = reverse_lazy('blog:news_list')
+    success_message = 'Письмо с инструкцией по восстановлению пароля отправлена на ваш email'
+    subject_template_name = 'system/email/password_subject_reset_mail.txt'
+    email_template_name = 'system/email/password_reset_mail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Запрос на восстановление пароля'
+        return context
+
+
+class UserPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView):
+    """
+    Представление установки нового пароля (из почты)
+    """
+    form_class = UserSetNewPasswordForm
+    template_name = 'system/user_password_set_new.html'
+    success_url = reverse_lazy('blog:news_list')
+    success_message = 'Пароль успешно изменен. Можете авторизоваться на сайте.'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Установить новый пароль'
+        return context

@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm      # регистрации
 from django.contrib.auth.forms import AuthenticationForm    # авторизация
-from django.contrib.auth.forms import SetPasswordForm       # восстановление пароля
+from django.contrib.auth.forms import SetPasswordForm       # изменить пароль (установить)
+from django.contrib.auth.forms import PasswordResetForm     # восстановить пароль
 from .models import Profile
 
 ''' 
@@ -116,10 +117,43 @@ class UserLoginForm(AuthenticationForm):
 
 class UserPasswordChangeForm(SetPasswordForm):
     """
-    Форма изменения пароля
+    Форма изменения пароля (авторизация уже сделана!)
     В примере выше мы наследуемся уже от существующей формы в Django: SetPasswordForm.
     Добавляем лишь стили под Bootstrap по необходимости.
     """
+    def __init__(self, *args, **kwargs):
+        """
+        Обновление стилей формы
+        """
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'uk-form-control',
+                'autocomplete': 'off'
+            })
+
+class UserForgotPasswordForm(PasswordResetForm):
+    """
+    Запрос на восстановление пароля (авторизация не сделана)
+    """
+
+    def __init__(self, *args, **kwargs):
+        """
+        Обновление стилей формы
+        """
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control',
+                'autocomplete': 'off'
+            })
+
+class UserSetNewPasswordForm(SetPasswordForm):
+    """
+    Изменение пароля пользователя после подтверждения  (авторизация не сделана)
+    В чем разница с UserPasswordChangeForm не понятно!
+    """
+
     def __init__(self, *args, **kwargs):
         """
         Обновление стилей формы
