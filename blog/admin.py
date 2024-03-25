@@ -1,6 +1,6 @@
 from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin # Вложенные категори МРТТ
-from .models import News, Category
+from .models import News, Category, Comment
 
 # изменение формата дат в админке в приложении данном
 from django.conf.locale.ru import formats as ru_formats
@@ -29,6 +29,17 @@ class CategoryAdmin(DraggableMPTTAdmin):
         ('Основная инфрмация', {'fields':('title', 'slug', 'parent','is_published')}),
         ('Описание', {'fields': ('description',)}),
     )
+
+@admin.register(Comment)
+class CommentAdminPage(DraggableMPTTAdmin):
+    """
+    Админ-панель модели комментариев
+    """
+    list_display = ('tree_actions', 'indented_title', 'news', 'created_by', 'created_at', 'is_published')
+    mptt_level_indent = 2
+    list_display_links = ('news',)
+    list_filter = ('created_at', 'updated_at', 'created_by')
+    list_editable = ('is_published',)
 
 # admin.site.register(News, NewsAdmin)  # other view
 # admin.site.register(Category, CategoryAdmin)

@@ -63,18 +63,16 @@ class News(models.Model):
     class NewsManager(models.Manager):
         """
         Кастомный менеджер для модели статей
+        можно добавить еще для СтатьиВКатегорииИподкатегрии
         """
-
         def all(self):
             """
-            Список статей (SQL запрос с фильтрацией для страницы списка статей)
-            не очнь подходит, для данной цели, используем queryset = News.customNewsManager.all()
-            так как функция all()  и надо использовать без filters
+            Список статей, статья вко, категория вкл, оптимизация (SQL запрос с фильтрацией)
             """
-            return self.get_queryset().filter(is_published=True)
-    ''' выключил его нахер, так как можно запустаться в запросах в представлении 
-    наже переопределяем objects на customNewsManager'''
-    #customNewsManager = NewsManager()   #  переопределяем objects на customNewsManager
+            return self.get_queryset().filter(is_published=True, category__is_published=True).select_related('category', 'created_by')
+
+    """ Тут можно жестко лажануть, и забыть что обьект переопределен НО только АЛЛ()"""
+    objects = NewsManager()   #  переопределяем objects на customNewsManager
 
 
     title = models.CharField(max_length=200, verbose_name='Заголовок')
@@ -94,8 +92,6 @@ class News(models.Model):
                                 related_name='updater_posts', blank=True)
     fixed = models.BooleanField(verbose_name='Зафиксировано', default=False)
     views = models.IntegerField(default=0, verbose_name='Просмотры', )
-
-
 
     class Meta:
         verbose_name = 'Новость'  # Имя модели в единственном числе
@@ -122,3 +118,30 @@ class News(models.Model):
         if not self.slug:
             self.slug = unique_slugify(self, self.title)
         super().save(*args, **kwargs)
+
+
+class Comment(MPTTModel):
+    """
+    Модель древовидных комментариев
+    """
+
+    news = models.ForeignKey(News, on_delete=models.CASCADE, verbose_name='Статья', related_name='comments')
+    created_by = models.ForeignKey(User, verbose_name='Автор комментария', on_delete=models.CASCADE, related_name='comments_created')
+    content = models.TextField(verbose_name='Текст комментария', max_length=3000)
+    created_at = models.DateTimeField(verbose_name='Время добавления', auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name='Время обновления', auto_now=True)
+    is_published = models.BooleanField(default=True, verbose_name='Статус поста')
+    parent = TreeForeignKey('self', verbose_name='Родительский комментарий', null=True, blank=True, related_name='children', on_delete=models.CASCADE)
+
+    class MTTMeta:
+        # order_insertion_by - сортировка по вложенности
+        order_insertion_by = ('-created_at',)
+
+    class Meta:
+        indexes = [models.Index(fields=['-created_at', 'updated_at', 'is_published', 'parent'])]
+        ordering = ['-created_at']
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self):
+        return f'{self.created_by}:{self.content}'
