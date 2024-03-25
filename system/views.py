@@ -1,16 +1,27 @@
 
-from django.views.generic import DetailView, UpdateView, ListView, CreateView
-from django.db import transaction
+from django.views.generic import DetailView, UpdateView, ListView, CreateView, View, TemplateView
+from django.db import transaction                                   # для обьедения форм при регитрации
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.mixins import UserPassesTestMixin                              # тест на изменение профиля
+from django.contrib.auth.views import LoginView, LogoutView         # вход выход
+from django.contrib.auth.tokens import default_token_generator      # подтвеждение емайла
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  # подтвеждение емайла
+from django.utils.encoding import force_bytes                       # подтвеждение емайла
+from django.contrib.sites.models import Site                        # подтвеждение емайла
+from django.core.mail import send_mail                              # подтвеждение емайла
+from django.contrib.auth import login                               # подтвеждение емайла
+from django.shortcuts import redirect
+
+from django.contrib.messages.views import SuccessMessageMixin       # Messages
+from django.contrib.auth.mixins import UserPassesTestMixin          # тест на изменение профиля
 from django.contrib.auth.views import (PasswordChangeView, PasswordResetConfirmView,
-                                       PasswordResetView )     # изм/восст пароля
+                                       PasswordResetView )          # изм/восст пароля
 from .models import Profile
 from .forms import (UserUpdateForm, ProfileUpdateForm, UserRegisterForm, UserLoginForm,
                     UserPasswordChangeForm, UserForgotPasswordForm, UserSetNewPasswordForm)
 
+from services.mixins import UserIsNotAuthenticated                  # запрет регистрации авторизованных юзеров
+from django.contrib.auth import get_user_model                      # нужен для подтвеждение емайла
+User = get_user_model()
 
 class ProfileListView(ListView):
     """
@@ -86,20 +97,38 @@ class ProfileUpdateView(UserPassesTestMixin, UpdateView):
         return reverse('system:profile_detail', kwargs={'slug': self.object.slug})
 
 
-class UserRegisterView(SuccessMessageMixin, CreateView):
+class UserRegisterView(UserIsNotAuthenticated, SuccessMessageMixin, CreateView):
     """
-    Представление регистрации на сайте с формой регистрации
+    Представление регистрации на сайте с формой регистрации, и отправкой письма подтвеждения
     """
     form_class = UserRegisterForm
-    #success_url = reverse_lazy('home')
-    template_name = 'system/user_register.html'
-    success_message = 'Вы успешно зарегистрировались. Можете войти на сайт!'
+    #success_url = reverse_lazy('blog:news_list')
+    template_name = 'system/registration/user_register.html'
+    success_message = 'Письмо подтверждения отправлено!'
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Регистрация на сайте'
         return context
 
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
+        # Функционал для отправки письма и генерации токена
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        activation_url = reverse_lazy('system:confirm_email', kwargs={'uidb64': uid, 'token': token})
+        current_site = Site.objects.get_current().domain
+        send_mail(
+            'Подтвердите свой электронный адрес',
+            f'Пожалуйста, перейдите по следующей ссылке, чтобы подтвердить свой адрес электронной почты: http://{current_site}{activation_url}',
+            'elskazii@yandex.ru',
+            [user.email],
+            fail_silently=False,
+        )
+        return redirect('system:email_confirmation_sent')
 
 class UserLoginView(SuccessMessageMixin, LoginView):
     """
@@ -170,4 +199,55 @@ class UserPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Установить новый пароль'
+        return context
+
+# далее подтвеждение почты
+class UserConfirmEmailView(View):
+    '''
+    Перекидывает и проверяет из отправленного письма, в это представление
+    если все ок то перекинуть на страницу email_confirmed, если нет то на стр email_confirmation_failed
+    '''
+    def get(self, request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64)
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            login(request, user)
+            return redirect('system:email_confirmed')
+        else:
+            return redirect('system:email_confirmation_failed')
+
+
+class EmailConfirmationSentView(TemplateView):
+    '''Письмо подтверждения отправлено!  перекидывает Юзера на эту страницу, после регитрации'''
+    template_name = 'system/registration/email_confirmation_sent.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Письмо активации отправлено'
+        return context
+
+
+class EmailConfirmedView(TemplateView):
+    '''Электронная почта подтверждена '''
+    template_name = 'system/registration/email_confirmed.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Ваш электронный адрес активирован'
+        return context
+
+
+class EmailConfirmationFailedView(TemplateView):
+    '''Ошибка подтверждения по электронной почте, типа если ранее уже подтвердил '''
+    template_name = 'system/registration/email_confirmation_failed.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Ваш электронный адрес не активирован'
         return context

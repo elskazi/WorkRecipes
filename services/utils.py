@@ -3,7 +3,7 @@ from pytils.translit import slugify
 
 def unique_slugify(instance, slug):
     """
-    Генератор уникальных SLUG для моделей, в случае существования такого SLUG.
+    Генератор уникальных SLUG в URLs для моделей, в случае существования такого SLUG.
     """
     model = instance.__class__
     unique_slug = slugify(slug)

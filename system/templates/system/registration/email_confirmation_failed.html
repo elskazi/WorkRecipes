@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ page_title }} | {{ block.super }}
+{% endblock %}
+
+{% block body %}
+<div class="uk-alert uk-alert-danger" role="alert">
+    <h4 class="uk-alert-heading">Ошибка подтверждения по электронной почте</h4>
+    <p>Ссылка для подтверждения по электронной почте недействительна или срок ее действия истек. Пожалуйста, зарегистрируйтесь снова.</p>
+</div>
+{% endblock %}
