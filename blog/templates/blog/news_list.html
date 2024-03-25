@@ -52,7 +52,7 @@
 
                                                             <a href="{% url 'blog:news_by_category' item.category.slug %}">
                                                                 {{ item.category.title }}</a>
-                                                            | {{ item.created_by }} |
+                                                            | {{ item.created_by.username }} |
                                                             {{ item.created_at }}
 
                                                         </div>
