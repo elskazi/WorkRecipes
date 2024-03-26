@@ -24,7 +24,7 @@ class NewsListViews(ListView):
     page_header = 'Блог Аркаши'
     page_title = 'Блог Аркаши'
     # queryset = News.objects.filter(is_published=True, category__is_published=True).select_related('category', 'created_by')
-    queryset = News.objects.all()
+    queryset = model.objects.all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """ GET:param object_list::param kwargs::return:"""
@@ -62,6 +62,7 @@ class NewsByCategoryListView(ListView):
 class NewsDetailViews(DetailView):
     """Детали статьи"""
     model = News
+    queryset = model.objects.detail()
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """ GET:param object_list::param kwargs::return:"""
@@ -116,7 +117,7 @@ class NewsUpdateView(AuthorRequiredMixin, SuccessMessageMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        # form.instance.updater = self.request.user # убрана для возможности получения пользователя для обновления
+        # form.instance.cre,,, = self.request.user # убрана для возможности получения пользователя для обновления
         form.save()
         return super().form_valid(form)
 
@@ -171,6 +172,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
             }, status=200)
 
         return redirect(comment.news.get_absolute_url())
+        #return redirect("blog:comment_create_view")
 
     def handle_no_permission(self):
         return JsonResponse({'error': 'Необходимо авторизоваться для добавления комментариев'}, status=400)

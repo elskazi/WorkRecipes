@@ -13,7 +13,7 @@ urlpatterns = [
     path('news/<str:slug>/update/', NewsUpdateView.as_view(), name='news_update'),
     path('news/<str:slug>/delete/', NewsDeleteView.as_view(), name='news_delete'),
     path('category/<str:slug>/', NewsByCategoryListView.as_view(), name='news_by_category'),
-    path('articles/<int:pk>/comments/create/', CommentCreateView.as_view(), name='comment_create_view'),
+    path('news/<int:pk>/comments/create/', CommentCreateView.as_view(), name='comment_create_view'),
 
     path('request/', HttpRequestPage.as_view(), name='news_request'),
 

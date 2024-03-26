@@ -70,7 +70,7 @@ class Profile(models.Model):
         """
         Ссылка на профиль
         """
-        return reverse('profile_detail', kwargs={'slug': self.slug})
+        return reverse('system:profile_detail', kwargs={'slug': self.slug})
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):

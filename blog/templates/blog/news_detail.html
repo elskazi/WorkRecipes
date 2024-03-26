@@ -1,40 +1,56 @@
 {% extends 'base.html' %}
-{%load static %}
+{% load static %}
+{% load mptt_tags %}
 
 {% block title %}
     {{ object.title }} | {{ block.super }}
 {% endblock %}
 
 {% block body %}
-<main id="tm-main">
-    <!-- Content -->
-    <div class="uk-section-default uk-section">
-        <div class="uk-container">
-            <div class="uk-grid tm-grid-expand uk-grid-margin uk-grid" uk-grid="">
-            
-                <div class="uk-width-2-3@m uk-flex-first@m">
-                    <h1>{{ object.title }}</h1>
-                
-                    <h4 class="uk-text-meta uk-margin-small">
-                        
-                        <time datetime="{{ object.created_at }}">{{ object.created_at }}</time>
-                        | <a href="#">{{ object.created_by }}</a> | <a
-                            href="{% url 'blog:news_by_category' object.category.slug %}"
-                            rel="tag">{{ object.category.title }}</a> </h4>
-                    <div class="uk-margin">
-                        <img decoding="async" 
-src="{% if object.photo %}{{ object.photo.url }}{% else %}{% static 'images/BestCow800x450.jpg' %}{% endif %}" 
-                             width="780"
-                             class="el-image" alt="{{ object.title }}" loading="lazy">
+    <main id="tm-main">
+        <!-- Content -->
+        <div class="uk-section-default uk-section">
+            <div class="uk-container">
+                <div class="uk-grid tm-grid-expand uk-grid-margin uk-grid" uk-grid="">
+
+                    <div class="uk-width-2-3@m uk-flex-first@m">
+                        <h1>{{ object.title }}</h1>
+
+                        <h4 class="uk-text-meta uk-margin-small">
+
+                            <time datetime="{{ object.created_at }}">{{ object.created_at }}</time>
+
+                            | <a href="{{ object.created_by.profile.get_absolute_url }}">
+                            {# {% url 'system:profile_detail' slug=object.created_by.profile.slug  %}  #}
+                            {{ object.created_by }}
+                        </a> | <a
+                                href="{% url 'blog:news_by_category' object.category.slug %}"
+                                rel="tag">{{ object.category.title }}</a></h4>
+                        <div class="uk-margin">
+                            <img decoding="async"
+                                 src="
+                                         {% if object.photo %}{{ object.photo.url }}{% else %}{% static 'images/BestCow800x450.jpg' %}{% endif %}"
+                                 width="780"
+                                 class="el-image" alt="{{ object.title }}" loading="lazy">
+                        </div>
+                        <div class="uk-panel uk-margin">
+                            {{ object.content|safe|linebreaks }}
+                        </div>
+                        {# comments #}
+                        <div class="card border-0">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Комментарии
+                                </h5>
+                                {% include 'blog/comments/comments_list.html' %}
+                            </div>
+                        </div>
+
                     </div>
-                    <div class="uk-panel uk-margin">
-                       {{ object.content|safe|linebreaks }}
-                    </div>
-                </div>
-                {# sidebar #}
+                    {# sidebar #}
                     {% include 'blog/sidebar.html' %}
+                </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 {% endblock %}

@@ -67,9 +67,20 @@ class News(models.Model):
         """
         def all(self):
             """
-            Список статей, статья вко, категория вкл, оптимизация (SQL запрос с фильтрацией)
+            Список статей, статья и категория вкл, оптимизация (SQL запрос с фильтрацией)
             """
-            return self.get_queryset().filter(is_published=True, category__is_published=True).select_related('category', 'created_by')
+            return self.get_queryset().filter(is_published=True,
+                                              category__is_published=True).\
+                select_related('category', 'created_by', 'created_by__profile')
+
+        def detail(self):
+            """
+            Детальная статья (SQL запрос с фильтрацией для страницы со статьёй)
+            """
+            return self.get_queryset() \
+                .select_related('created_by', 'category', 'created_by__profile') \
+                .prefetch_related('comments', 'comments__created_by', 'comments__created_by__profile') \
+                .filter(is_published=True, category__is_published=True )
 
     """ Тут можно жестко лажануть, и забыть что обьект переопределен НО только АЛЛ()"""
     objects = NewsManager()   #  переопределяем objects на customNewsManager
