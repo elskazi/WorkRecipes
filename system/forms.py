@@ -1,10 +1,10 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm      # регистрации
-from django.contrib.auth.forms import AuthenticationForm    # авторизация
-from django.contrib.auth.forms import SetPasswordForm       # изменить пароль (установить)
-from django.contrib.auth.forms import PasswordResetForm     # восстановить пароль
-from .models import Profile
+from django.contrib.auth.forms import UserCreationForm  # регистрации
+from django.contrib.auth.forms import AuthenticationForm  # авторизация
+from django.contrib.auth.forms import SetPasswordForm  # изменить пароль (установить)
+from django.contrib.auth.forms import PasswordResetForm  # восстановить пароль
+from .models import Profile, Feedback
 
 ''' 
     Создаем две формы:
@@ -12,6 +12,7 @@ from .models import Profile
     втрорая Профайл(созданная в модели).
     Соеденена связью одна ко одному в моделе
 '''
+
 
 class UserUpdateForm(forms.ModelForm):
     """
@@ -43,10 +44,12 @@ class UserUpdateForm(forms.ModelForm):
             raise forms.ValidationError('Email адрес должен быть уникальным')
         return email
 
+
 class ProfileUpdateForm(forms.ModelForm):
     """
     Форма обновления данных профиля пользователя
     """
+
     class Meta:
         model = Profile
         fields = ('slug', 'birth_date', 'bio', 'avatar')
@@ -61,6 +64,7 @@ class ProfileUpdateForm(forms.ModelForm):
                 'class': 'uk-form-controls',
                 'autocomplete': 'off'
             })
+
 
 class UserRegisterForm(UserCreationForm):
     """
@@ -94,6 +98,7 @@ class UserRegisterForm(UserCreationForm):
             self.fields['password2'].widget.attrs.update({"placeholder": 'Повторите придуманный пароль'})
             self.fields[field].widget.attrs.update({"class": "form-control", "autocomplete": "off"})
 
+
 class UserLoginForm(AuthenticationForm):
     """
     Форма авторизации на сайте
@@ -121,6 +126,7 @@ class UserPasswordChangeForm(SetPasswordForm):
     В примере выше мы наследуемся уже от существующей формы в Django: SetPasswordForm.
     Добавляем лишь стили под Bootstrap по необходимости.
     """
+
     def __init__(self, *args, **kwargs):
         """
         Обновление стилей формы
@@ -131,6 +137,7 @@ class UserPasswordChangeForm(SetPasswordForm):
                 'class': 'uk-form-control',
                 'autocomplete': 'off'
             })
+
 
 class UserForgotPasswordForm(PasswordResetForm):
     """
@@ -148,6 +155,7 @@ class UserForgotPasswordForm(PasswordResetForm):
                 'autocomplete': 'off'
             })
 
+
 class UserSetNewPasswordForm(SetPasswordForm):
     """
     Изменение пароля пользователя после подтверждения  (авторизация не сделана)
@@ -164,3 +172,21 @@ class UserSetNewPasswordForm(SetPasswordForm):
                 'class': 'uk-form-control',
                 'autocomplete': 'off'
             })
+
+
+class FeedbackCreateForm(forms.ModelForm):
+    """
+    Форма отправки обратной связи
+    """
+
+    class Meta:
+        model = Feedback
+        fields = ('subject', 'email', 'content')
+
+    def __init__(self, *args, **kwargs):
+        """
+        Обновление стилей формы
+        """
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class': 'uk-form-control', 'autocomplete': 'off'})

@@ -1,27 +1,32 @@
-
 from django.views.generic import DetailView, UpdateView, ListView, CreateView, View, TemplateView
-from django.db import transaction                                   # для обьедения форм при регитрации
+from django.db import transaction  # для обьедения форм при регитрации
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth.views import LoginView, LogoutView         # вход выход
-from django.contrib.auth.tokens import default_token_generator      # подтвеждение емайла
+from django.contrib.auth.views import LoginView, LogoutView  # вход выход
+from django.contrib.auth.tokens import default_token_generator  # подтвеждение емайла
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  # подтвеждение емайла
-from django.utils.encoding import force_bytes                       # подтвеждение емайла
-from django.contrib.sites.models import Site                        # подтвеждение емайла
-from django.core.mail import send_mail                              # подтвеждение емайла
-from django.contrib.auth import login                               # подтвеждение емайла
+from django.utils.encoding import force_bytes  # подтвеждение емайла
+from django.contrib.sites.models import Site  # подтвеждение емайла
+from django.core.mail import send_mail  # подтвеждение емайла
+from django.contrib.auth import login  # подтвеждение емайла
 from django.shortcuts import redirect
 
-from django.contrib.messages.views import SuccessMessageMixin       # Messages
-from django.contrib.auth.mixins import UserPassesTestMixin          # тест на изменение профиля
+from django.contrib.messages.views import SuccessMessageMixin  # Messages
+from django.contrib.auth.mixins import UserPassesTestMixin  # тест на изменение профиля
 from django.contrib.auth.views import (PasswordChangeView, PasswordResetConfirmView,
-                                       PasswordResetView )          # изм/восст пароля
-from .models import Profile
+                                       PasswordResetView)  # изм/восст пароля
+from .models import Profile, Feedback
 from .forms import (UserUpdateForm, ProfileUpdateForm, UserRegisterForm, UserLoginForm,
-                    UserPasswordChangeForm, UserForgotPasswordForm, UserSetNewPasswordForm)
+                    UserPasswordChangeForm, UserForgotPasswordForm, UserSetNewPasswordForm,
+                    FeedbackCreateForm, )
 
-from services.mixins import UserIsNotAuthenticated                  # запрет регистрации авторизованных юзеров
-from django.contrib.auth import get_user_model                      # нужен для подтвеждение емайла
+from services.mixins import UserIsNotAuthenticated  # запрет регистрации авторизованных юзеров
+from services.email import send_contact_email_message # отрпавка письма Админу
+from services.utils import get_client_ip  # получение IP
+
+from django.contrib.auth import get_user_model  # model User, нужен для подтвеждение емайла
+
 User = get_user_model()
+
 
 class ProfileListView(ListView):
     """
@@ -70,7 +75,6 @@ class ProfileUpdateView(UserPassesTestMixin, UpdateView):
         else:
             return False
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = f'Редактирование профиля пользователя: {self.request.user.username}'
@@ -102,10 +106,9 @@ class UserRegisterView(UserIsNotAuthenticated, SuccessMessageMixin, CreateView):
     Представление регистрации на сайте с формой регистрации, и отправкой письма подтвеждения
     """
     form_class = UserRegisterForm
-    #success_url = reverse_lazy('blog:news_list')
+    # success_url = reverse_lazy('blog:news_list')
     template_name = 'system/registration/user_register.html'
     success_message = 'Письмо подтверждения отправлено!'
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -130,6 +133,7 @@ class UserRegisterView(UserIsNotAuthenticated, SuccessMessageMixin, CreateView):
         )
         return redirect('system:email_confirmation_sent')
 
+
 class UserLoginView(SuccessMessageMixin, LoginView):
     """
     Авторизация на сайте
@@ -151,6 +155,7 @@ class UserLogoutView(SuccessMessageMixin, LogoutView):
     """
     next_page = reverse_lazy('blog:news_list')
     success_message = 'Вы вышли из учётной записи.'
+
 
 # далее игра с паролями
 class UserPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
@@ -201,12 +206,14 @@ class UserPasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView
         context['page_title'] = 'Установить новый пароль'
         return context
 
+
 # далее подтвеждение почты
 class UserConfirmEmailView(View):
     '''
     Перекидывает и проверяет из отправленного письма, в это представление
     если все ок то перекинуть на страницу email_confirmed, если нет то на стр email_confirmation_failed
     '''
+
     def get(self, request, uidb64, token):
         try:
             uid = urlsafe_base64_decode(uidb64)
@@ -251,3 +258,29 @@ class EmailConfirmationFailedView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Ваш электронный адрес не активирован'
         return context
+
+
+# Обратная связь
+class FeedbackCreateView(SuccessMessageMixin, CreateView):
+    model = Feedback
+    form_class = FeedbackCreateForm
+    success_message = 'Ваше письмо успешно отправлено администрации сайта'
+    template_name = 'system/feedback.html'
+    extra_context = {'title': 'Контактная форма'}
+    success_url = reverse_lazy('blog:news_list')
+
+    def form_valid(self, form):
+        """
+        Метод form_valid() переопределяет метод родительского класса и вызывается после успешной валидации формы.
+        В нем создается объект feedback, заполняется его атрибут ip_address с помощью функции get_client_ip(),
+        а если пользователь аутентифицирован, то заполняется его атрибут user.
+        Затем вызывается функция send_contact_email_message(), которая отправляет электронное письмо.
+        """
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.ip_address = get_client_ip(self.request)
+            if self.request.user.is_authenticated:
+                feedback.user = self.request.user
+            send_contact_email_message(feedback.subject, feedback.email, feedback.content, feedback.ip_address,
+                                       feedback.user_id)
+        return super().form_valid(form)
