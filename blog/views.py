@@ -12,6 +12,9 @@ from .models import News, Category, Comment
 from .forms import NewsCreateForm, NewsUpdateForm, CommentCreateForm
 from taggit.models import Tag
 
+import random                   # для похожих статей (по тегу)
+from django.db.models import Count # для похожих статей (по тегу)
+
 
 class NewsListViews(ListView):
     """ Список всех статей """
@@ -82,11 +85,25 @@ class NewsDetailViews(DetailView):
     model = News
     queryset = model.objects.detail()
 
+    def get_similar_articles(self, obj):
+        """
+        Похожие статьи по тегу
+        Метод get_similar_articles() извлекает список статей, которые имеют общие теги с текущей статьей,
+        и сортирует их по количеству общих тегов. Затем он перемешивает этот список и возвращает первые 6 статей.
+        """
+        article_tags_ids = obj.tags.values_list('id', flat=True)
+        similar_articles = News.objects.filter(tags__in=article_tags_ids).exclude(id=obj.id)
+        similar_articles = similar_articles.annotate(related_tags=Count('tags')).order_by('-related_tags')
+        similar_articles_list = list(similar_articles.all())
+        random.shuffle(similar_articles_list)
+        return similar_articles_list[:6]
+
     def get_context_data(self, *, object_list=None, **kwargs):
         """ GET:param object_list::param kwargs::return:"""
         context = super(NewsDetailViews, self).get_context_data(**kwargs)
         # context['title'] = self.object.title     # получить заголовок, ЗАЧЕМ? если может из обьекта, не исплольз
         context['form'] = CommentCreateForm
+        context['similar_articles'] = self.get_similar_articles(self.object)  # Похожие статьи по тегу
         return context
 
 

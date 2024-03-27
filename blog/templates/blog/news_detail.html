@@ -29,8 +29,8 @@
 
                             {% if object.tags.all %}
 
-                                    | Теги записи: {% for tag in object.tags.all %}
-                                    <a href="{% url 'blog:news_by_tags' tag.slug %}">{{ tag }}</a>,
+                                | Теги записи: {% for tag in object.tags.all %}
+                                <a href="{% url 'blog:news_by_tags' tag.slug %}">{{ tag }}</a>,
                             {% endfor %}
 
                             {% endif %}
@@ -40,6 +40,9 @@
                             <img decoding="async"
                                  src="
 
+
+
+
                                          {% if object.photo %}{{ object.photo.url }}{% else %}{% static 'images/BestCow800x450.jpg' %}{% endif %}"
                                  width="780"
                                  class="el-image" alt="{{ object.title }}" loading="lazy">
@@ -47,6 +50,21 @@
                         <div class="uk-panel uk-margin">
                             {{ object.content|safe|linebreaks }}
                         </div>
+                        {# похожие статьи по тегу  #}
+                        <div>
+                            <div class="card-title">
+                                Похожие статьи:
+                            </div>
+                            <div>
+                                <ul class="similar-articles">
+                                    {% for sim_article in similar_articles %}
+                                        <li><a href="{{ sim_article.get_absolute_url }}">{{ sim_article.title }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
                         {# comments #}
                         <div class="card border-0">
                             <div class="card-body">
