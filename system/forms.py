@@ -77,7 +77,7 @@ class UserRegisterForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         fields = UserCreationForm.Meta.fields + ('email', 'first_name', 'last_name')
 
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(), label='ReCAPTCHA')
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
 
     def clean_email(self):
         """
@@ -109,7 +109,9 @@ class UserLoginForm(AuthenticationForm):
     Форма авторизации на сайте
     наследуемся от существующей формы авторизации, добавив к ней стили
     """
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
+
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
+
     def __init__(self, *args, **kwargs):
         """
         Обновление стилей формы регистрации

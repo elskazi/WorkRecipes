@@ -7,6 +7,8 @@ pip install django-mptt     МРТТ категории вложенные (мо
 pip install pytils          сохранения уникального slug https://proghunter.ru/articles/django-base-2023-automatic-slug-generation-cyrillic-handling-in-django-9
 pip install django-debug-toolbar    INSATALL- 'debug_toolbar'  middleware - 'debug_toolbar.middleware.DebugToolbarMiddleware'
 pip install django-recaptcha==3.0.0  Капча
+pip install django-taggit   Тэги    py manage.py migrate
+pip install django-autocomplete-light  Удалил, хотел сделать автоподстановку тегов
 
 """
 
@@ -40,22 +42,27 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',         # нужен для прописывание в админке домена, дописать! SITE_ID = 1, Миграцию сделать!
+    'django.contrib.sites',  # нужен для прописывание в админке домена, дописать! SITE_ID = 1, Миграцию сделать!
 
     'debug_toolbar',
     'mptt',  # MPTT вложенные категории
     'django_ckeditor_5',
     'captcha',
+    'taggit',
+
     'services',  # folder for utils
 
-    'blog.apps.BlogConfig',             # blog
-    'system.apps.SystemConfig',         # users
+    'blog.apps.BlogConfig',  # blog
+    'system.apps.SystemConfig',  # users
 ]
-SITE_ID = 1     # нужен для прописывание в админке домена, дописать 'django.contrib.sites' и миграцию
+SITE_ID = 1  # нужен для прописывание в админке домена, дописать 'django.contrib.sites' и миграцию
 
 RECAPTCHA_PUBLIC_KEY = '6LduxqUpAAAAAINXzAkfW_FO7L8vbYkDcin2Rdik'
 RECAPTCHA_PRIVATE_KEY = '6LduxqUpAAAAALVRPLoJU6xPKs9w0pwccKbh_QKB'
-#RECAPTCHA_DOMAIN = 'www.recaptcha.net'
+# RECAPTCHA_DOMAIN = 'www.recaptcha.net'
+
+TAGGIT_CASE_INSENSITIVE = True
+TAGGIT_STRIP_UNICODE_WHEN_SLUGIFYING = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -128,9 +135,9 @@ USE_I18N = True
 USE_TZ = True
 
 """Подключение статики и медиа."""
-STATIC_URL = 'static/'              # как быдет выглядеть ссылка
-STATIC_ROOT = BASE_DIR / 'static'   # общие для всех
-STATICFILES_DIRS = [                # доп папки со статикой, для отдельных приложений
+STATIC_URL = 'static/'  # как быдет выглядеть ссылка
+STATIC_ROOT = BASE_DIR / 'static'  # общие для всех
+STATICFILES_DIRS = [  # доп папки со статикой, для отдельных приложений
     BASE_DIR / 'templates/src',
 ]
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -140,7 +147,7 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = reverse_lazy("blog:news_list")  # когда вошел, куда перекинуть, обычно профайл Юзера
-LOGIN_URL = reverse_lazy("blog:news_list")           # перенаправлять для ВХОДА, обычно страница Логин
+LOGIN_URL = reverse_lazy("blog:news_list")  # перенаправлять для ВХОДА, обычно страница Логин
 LOGOUT_REDIRECT_URL = reverse_lazy("system:logout")  # ?
 
 # Ресайз изображений при закгрузке
@@ -155,7 +162,7 @@ DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
 
 # YANDEX MAIL Шестерня- Все настройки - Почтовые программы - Разрешить доступ к почтовому ящику с помощью почтовых клиентов
 # С сервера imap.yandex.ru по протоколу IMAP
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # для реальной отправки
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # для реальной отправки
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для консоли
 EMAIL_HOST = 'smtp.yandex.ru'  # 'mail.btrussia.ru' #'mail.btrussia.com'    'smtp.yandex.ru'
 EMAIL_PORT = 465  # 25

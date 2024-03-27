@@ -6,7 +6,8 @@ from mptt.models import MPTTModel, TreeForeignKey   # MPTT категории
 
 from django.contrib.auth import get_user_model      # model USER
 from services.utils import unique_slugify           # use my utils for slug unical
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator # для проверки расширения изображения
+from taggit.managers import TaggableManager # Tags
 
 User = get_user_model()                             # use model USER
 """
@@ -79,7 +80,7 @@ class News(models.Model):
             """
             return self.get_queryset() \
                 .select_related('created_by', 'category', 'created_by__profile') \
-                .prefetch_related('comments', 'comments__created_by', 'comments__created_by__profile') \
+                .prefetch_related('comments', 'comments__created_by', 'comments__created_by__profile','tags') \
                 .filter(is_published=True, category__is_published=True )
 
     """ Тут можно жестко лажануть, и забыть что обьект переопределен НО только АЛЛ()"""
@@ -103,6 +104,7 @@ class News(models.Model):
                                 related_name='updater_posts', blank=True)
     fixed = models.BooleanField(verbose_name='Зафиксировано', default=False)
     views = models.IntegerField(default=0, verbose_name='Просмотры', )
+    tags = TaggableManager()
 
     class Meta:
         verbose_name = 'Новость'  # Имя модели в единственном числе

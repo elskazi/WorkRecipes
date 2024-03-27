@@ -10,7 +10,7 @@ from django.contrib.messages.views import SuccessMessageMixin  # Миксин у
 from services.mixins import AuthorRequiredMixin  # Миксин редактирования статьи только автор
 from .models import News, Category, Comment
 from .forms import NewsCreateForm, NewsUpdateForm, CommentCreateForm
-
+from taggit.models import Tag
 
 
 class NewsListViews(ListView):
@@ -56,6 +56,24 @@ class NewsByCategoryListView(ListView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = self.category.title
         context['page_header'] = f'Статьи из категории: {self.category.title}'
+        return context
+
+
+class NewsByTagListView(ListView):
+    model = News
+    #template_name = 'blog/news_list.html'
+    #context_object_name = 'articles'
+    paginate_by = 9
+    tag = None
+
+    def get_queryset(self):
+        self.tag = Tag.objects.get(slug=self.kwargs['tag'])
+        queryset = News.objects.all().filter(tags__slug=self.tag.slug)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = f'Статьи по тегу: {self.tag.name}'
         return context
 
 
