@@ -6,6 +6,7 @@ pip install django-ckeditor-5
 pip install django-mptt     МРТТ категории вложенные (можно одну категория вклыдвать в другую категорию)
 pip install pytils          сохранения уникального slug https://proghunter.ru/articles/django-base-2023-automatic-slug-generation-cyrillic-handling-in-django-9
 pip install django-debug-toolbar    INSATALL- 'debug_toolbar'  middleware - 'debug_toolbar.middleware.DebugToolbarMiddleware'
+pip install django-recaptcha==3.0.0  Капча
 
 """
 
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'mptt',  # MPTT вложенные категории
     'django_ckeditor_5',
+    'captcha',
     'services',  # folder for utils
 
     'blog.apps.BlogConfig',             # blog
@@ -51,6 +53,9 @@ INSTALLED_APPS = [
 ]
 SITE_ID = 1     # нужен для прописывание в админке домена, дописать 'django.contrib.sites' и миграцию
 
+RECAPTCHA_PUBLIC_KEY = '6LduxqUpAAAAAINXzAkfW_FO7L8vbYkDcin2Rdik'
+RECAPTCHA_PRIVATE_KEY = '6LduxqUpAAAAALVRPLoJU6xPKs9w0pwccKbh_QKB'
+#RECAPTCHA_DOMAIN = 'www.recaptcha.net'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

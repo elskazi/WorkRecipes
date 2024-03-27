@@ -4,12 +4,15 @@ from django.contrib.auth.forms import UserCreationForm  # регистрации
 from django.contrib.auth.forms import AuthenticationForm  # авторизация
 from django.contrib.auth.forms import SetPasswordForm  # изменить пароль (установить)
 from django.contrib.auth.forms import PasswordResetForm  # восстановить пароль
+from django.conf import settings # captcha
+from captcha.fields import ReCaptchaField # captcha
+from captcha.widgets import ReCaptchaV2Checkbox # captcha
 from .models import Profile, Feedback
 
 ''' 
     Создаем две формы:
     одна от модели Юзерс(стандартая джанго, 
-    втрорая Профайл(созданная в модели).
+    вторая Профайл(созданная в модели).
     Соеденена связью одна ко одному в моделе
 '''
 
@@ -74,6 +77,8 @@ class UserRegisterForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         fields = UserCreationForm.Meta.fields + ('email', 'first_name', 'last_name')
 
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(), label='ReCAPTCHA')
+
     def clean_email(self):
         """
         Проверка email на уникальность
@@ -104,7 +109,7 @@ class UserLoginForm(AuthenticationForm):
     Форма авторизации на сайте
     наследуемся от существующей формы авторизации, добавив к ней стили
     """
-
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
     def __init__(self, *args, **kwargs):
         """
         Обновление стилей формы регистрации
@@ -190,3 +195,5 @@ class FeedbackCreateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': 'uk-form-control', 'autocomplete': 'off'})
+
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
