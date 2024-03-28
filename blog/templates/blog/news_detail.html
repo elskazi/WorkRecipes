@@ -39,10 +39,6 @@
                         <div class="uk-margin">
                             <img decoding="async"
                                  src="
-
-
-
-
                                          {% if object.photo %}{{ object.photo.url }}{% else %}{% static 'images/BestCow800x450.jpg' %}{% endif %}"
                                  width="780"
                                  class="el-image" alt="{{ object.title }}" loading="lazy">
@@ -50,6 +46,8 @@
                         <div class="uk-panel uk-margin">
                             {{ object.content|safe|linebreaks }}
                         </div>
+
+
                         {# похожие статьи по тегу  #}
                         <div>
                             <div class="card-title">

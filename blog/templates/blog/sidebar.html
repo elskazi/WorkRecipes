@@ -1,12 +1,35 @@
 {#{% load mptt_tags %}#}
 
-{# имя файла в blog/templatetags/ #}
-{% load category_menu_sidebar %}
+
+{# Ниже имеется ввиду Загрузить - имя файла в blog/templatetags/ через пробел#}
+{% load category_menu_sidebar blog_tags  %}
 
 <div class="uk-width-1-3@m uk-flex-first@s">
-{# имя функции в blog/templatetags/category_menu_sidebar.py #}
-{% show_category_menu %}
-{##}
+    {# IncludeTag имя функции в blog/templatetags/category_menu_sidebar.py #}
+    {% show_category_menu %}
+
+    {# SimpleTag имя функции в blog/templatetags/blog_tags.py #}
+    <div class="card mb-2">
+            <h5>Популярные теги</h5>
+            <div class="card-text">
+                <ul>
+                    {% popular_tags as tag_list %}
+                    {% for tag in tag_list %}
+                        <li><a href="{% url 'blog:news_by_tags' tag.slug %}">{{ tag.name }}</a> ({{ tag.num_times }})
+                        </li>
+                    {% empty %}
+                        <li>Популярных тегов не найдено.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+    </div>
+
+    {# IncludeTag имя функции в blog/templatetags/blog_tags.py #}
+    {# количество выводимых комментариев = 5. #}
+    {% show_latest_comments count=5 %}
+
+</div>
+{# было ранее Категории без использования шаблонныхТэгов#}
 {#{% full_tree_for_model blog.Category as categories %}#}
 {#    <ul class="uk-list uk-list-striped">#}
 {##}
@@ -32,7 +55,7 @@
 {#            </li>#}
 {#        {% endrecursetree %}#}
 {#    </ul>#}
-</div>
+{#</div>#}
 
 {#{% for i in category_published %}#}
 {#    {{ i }}#}

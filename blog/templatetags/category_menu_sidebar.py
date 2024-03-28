@@ -3,7 +3,7 @@ from blog.models import Category
 
 register = template.Library()
 
-@register.inclusion_tag('blog/category_menu_sidebar_tpl.html')      # передаем имя шаблон
-def show_category_menu(menu_class='uk-list'):                       # передаем дополнительно css
-    category_published = Category.objects.filter(is_published=True) # сам запрос для отображения
+@register.inclusion_tag('blog/inc/category_menu_sidebar_tpl.html')
+def show_category_menu(menu_class='uk-list'):
+    category_published = Category.objects.filter(is_published=True)
     return {'category_published':category_published, 'menu_class':menu_class}

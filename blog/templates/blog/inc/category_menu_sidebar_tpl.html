@@ -1,6 +1,7 @@
 {% load mptt_tags %}
 
 {% full_tree_for_model blog.Category as categories %}
+<div>
 <ul class="uk-list uk-list-striped">
     {% recursetree category_published %}
         {# recursetree      category_published  --or categories  #}
@@ -23,3 +24,4 @@
         </li>
     {% endrecursetree %}
 </ul>
+</div>
