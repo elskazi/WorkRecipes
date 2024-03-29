@@ -1,4 +1,15 @@
+------------------------------------------------
+Сделать копию БД в json:
+python manage.py dumpdata --exclude contenttypes --output db.json
+python -Xutf manage.py dumpdata --exclude contenttypes --output db.json
+python manage.py dumpdata --exclude contenttypes --exclude auth.permission --exclude admin.logentry --output db.json
+python -Xutf8 manage.py dumpdata --exclude contenttypes --exclude auth.permission --exclude admin.logentry --output db.json
+Добавлем -Xutf8 если под Windows
 
+Восстановить БД из json:
+python manage.py loaddata db.json
+python -Xutf8 manage.py loaddata db.json
+------------------------------------------------
 Что сделать:
 
 
