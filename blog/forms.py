@@ -48,8 +48,6 @@ class NewsUpdateForm(NewsCreateForm):
         self.fields['fixed'].widget.attrs.update({
             'class': 'uk-form-check-input'
         })
-
-
         self.fields['short_content'].widget.attrs.update({'class': 'uk-form-control django_ckeditor_5'})
         self.fields['content'].widget.attrs.update({'class': 'uk-form-control django_ckeditor_5'})
         self.fields['short_content'].required = False

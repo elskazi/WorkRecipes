@@ -2,7 +2,6 @@ from django.urls import path
 from .views import (
     NewsListViews, NewsCreateViews, NewsUpdateView, NewsDetailViews, NewsDeleteView,
     HttpRequestPage, NewsByCategoryListView, CommentCreateView, NewsByTagListView, NewsSearchResultView,
-
 )
 
 app_name = 'blog'
