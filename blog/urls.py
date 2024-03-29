@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (
     NewsListViews, NewsCreateViews, NewsUpdateView, NewsDetailViews, NewsDeleteView,
-    HttpRequestPage, NewsByCategoryListView, CommentCreateView, NewsByTagListView
+    HttpRequestPage, NewsByCategoryListView, CommentCreateView, NewsByTagListView, NewsSearchResultView,
+
 )
 
 app_name = 'blog'
@@ -15,6 +16,7 @@ urlpatterns = [
     path('category/<str:slug>/', NewsByCategoryListView.as_view(), name='news_by_category'),
     path('news/<int:pk>/comments/create/', CommentCreateView.as_view(), name='comment_create_view'),
     path('news/tags/<str:tag>/', NewsByTagListView.as_view(), name='news_by_tags'),
+    path('search/', NewsSearchResultView.as_view(), name='search'),
 
     path('request/', HttpRequestPage.as_view(), name='news_request'),
 

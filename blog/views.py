@@ -11,6 +11,7 @@ from services.mixins import AuthorRequiredMixin  # Миксин редактир
 from .models import News, Category, Comment
 from .forms import NewsCreateForm, NewsUpdateForm, CommentCreateForm
 from taggit.models import Tag
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank # поиск Postgers
 
 import random                   # для похожих статей (по тегу)
 from django.db.models import Count # для похожих статей (по тегу)
@@ -211,6 +212,36 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
     def handle_no_permission(self):
         return JsonResponse({'error': 'Необходимо авторизоваться для добавления комментариев'}, status=400)
+
+class NewsSearchResultView(ListView):
+    """
+    Реализация поиска статей на сайте
+    """
+    model = News
+    #context_object_name = 'articles'
+    paginate_by = 10
+    allow_empty = True
+    #template_name = 'blog/news_list.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get('do')
+        search_vector = SearchVector('content','title')
+        search_query = SearchQuery(query)
+        return (self.model.objects.annotate(search=search_vector,
+                                            rank=SearchRank(search_vector, search_query)).
+                filter(search=search_query).
+                order_by('-rank'))
+        #Post.object.annotate(search=SearchVector('title', 'body')).filter(search=query)
+    ''' search_vector = SearchVector('title', 'body')
+        search_query = SearchQuery(query)
+        results = Post.object.annotate(search=search_vector,
+            rank=SearchRank(search_vector, search_query)).filter(search=search_query).order_by('-rank')
+    '''
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = f'Результаты поиска: {self.request.GET.get("do")}'
+        return context
+
 
 
 class HttpRequestPage(View):
