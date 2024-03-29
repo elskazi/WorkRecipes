@@ -61,7 +61,7 @@
                                                         </div>
                                                         <div class="el-content uk-panel uk-margin-top">
                                                             {% autoescape off %}
-                                                                {{ item.short_content|truncatechars:77 }}
+                                                                {{ item.short_content|safe|truncatechars:77 }}
                                                             {% endautoescape %}
                                                         </div>
                                                     </div>

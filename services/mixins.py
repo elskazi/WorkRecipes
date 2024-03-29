@@ -13,7 +13,7 @@ class AuthorRequiredMixin(AccessMixin):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         if request.user.is_authenticated:
-            if request.user != self.get_object().author or request.user.is_staff:
+            if request.user != self.get_object().created_by or request.user.is_staff:
                 messages.info(request, 'Изменение и удаление статьи доступно только автору')
                 return redirect('blog:news_list')
         return super().dispatch(request, *args, **kwargs)

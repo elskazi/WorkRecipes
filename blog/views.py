@@ -114,7 +114,7 @@ class NewsCreateViews(LoginRequiredMixin, CreateView):
     # fields = 'title', 'content', 'photo', ...              # используем NewsCreateForm
     # success_url = reverse_lazy('blog:news_list')           # без этого перенаправит на созданную статью
     # login_url = reverse_lazy("blog:news_request")          # куда перекинуть после авторизации, пропискано в настройках
-    # template_name = 'blog/news_form.html'                  # форма по умолчанию
+    #template_name = 'blog/news_form.html'                  # форма по умолчанию
     page_header = 'Добавление новой записи'
     page_title = 'Добавление новой записи'
 

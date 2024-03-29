@@ -23,6 +23,11 @@ class NewsCreateForm(forms.ModelForm):
                 'class': 'uk-form-control',
                 'autocomplete': 'off'
             })
+        self.fields['short_content'].widget.attrs.update({'class': 'uk-form-control django_ckeditor_5'})
+        self.fields['content'].widget.attrs.update({'class': 'uk-form-control django_ckeditor_5'})
+        self.fields['short_content'].required = False
+        self.fields['content'].required = False
+
 
 
 class NewsUpdateForm(NewsCreateForm):
@@ -43,6 +48,12 @@ class NewsUpdateForm(NewsCreateForm):
         self.fields['fixed'].widget.attrs.update({
             'class': 'uk-form-check-input'
         })
+
+
+        self.fields['short_content'].widget.attrs.update({'class': 'uk-form-control django_ckeditor_5'})
+        self.fields['content'].widget.attrs.update({'class': 'uk-form-control django_ckeditor_5'})
+        self.fields['short_content'].required = False
+        self.fields['content'].required = False
 
 
 class CommentCreateForm(forms.ModelForm):
