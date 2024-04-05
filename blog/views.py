@@ -268,13 +268,13 @@ class RatingCreateView(View):
     model = Rating
 
     def post(self, request, *args, **kwargs):
-        article_id = request.POST.get('article_id')
+        news_id = request.POST.get('news_id')
         value = int(request.POST.get('value'))
         ip_address = get_client_ip(request)
         user = request.user if request.user.is_authenticated else None
 
         rating, created = self.model.objects.get_or_create(
-            article_id=article_id,
+            news_id=news_id,
             ip_address=ip_address,
             defaults={'value': value, 'user': user},
         )

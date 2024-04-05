@@ -7,10 +7,14 @@ from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap  # sitemap
 from blog.sitemaps import StaticSitemap, ArticleSitemap  # sitemap
 
-sitemaps = {
+sitemaps = {                        # map site
     'static': StaticSitemap,
     'articles': ArticleSitemap,
 }
+
+handler403 = 'system.views.tr_handler403'   # стр ошибок
+handler404 = 'system.views.tr_handler404'
+handler500 = 'system.views.tr_handler500'
 
 urlpatterns = [
     path('ckeditor5/', include('django_ckeditor_5.urls')),  # text editor
