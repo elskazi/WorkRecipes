@@ -8,6 +8,8 @@ from django.contrib.auth import get_user_model      # model USER
 from services.utils import unique_slugify           # use my utils for slug unical
 from django.core.validators import FileExtensionValidator # для проверки расширения изображения
 from taggit.managers import TaggableManager # Tags
+#from services.utils import unique_slugify, image_compress
+
 
 User = get_user_model()                             # use model USER
 """
@@ -122,6 +124,11 @@ class News(models.Model):
         """
         return self.title
 
+    # def __init__(self, *args, **kwargs):
+    #     ''' Ресайзинг и оптимизация изображения в Django '''
+    #     super().__init__(*args, **kwargs)
+    #     self.__thumbnail = self.photo if self.pk else None
+
     def save(self, *args, **kwargs):
         """
         Сохранение полей модели при их отсутствии заполнения
@@ -132,9 +139,17 @@ class News(models.Model):
             self.slug = unique_slugify(self, self.title)
         super().save(*args, **kwargs)
 
+        # if self.__thumbnail != self.photo and self.photo:
+        #     ''' Ресайзинг и оптимизация изображения в Django '''
+        #     image_compress(self.photo.path, width=500, height=500)
+
     def get_sum_rating(self):
         ''' подсчета суммы рейтинг '''
         return sum([rating.value for rating in self.ratings.all()])
+
+
+
+
 
 
 class Comment(MPTTModel):

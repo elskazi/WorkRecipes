@@ -7,6 +7,8 @@ from config import settings
 from urllib.parse import urljoin
 from datetime import datetime
 
+from PIL import Image, ImageOps  # Ресайзинг и оптимизация изображения в Django, не использую из урока №42
+
 
 def unique_slugify(instance, slug):
     """
@@ -45,3 +47,19 @@ class CkeditorCustomStorage(FileSystemStorage):
 
     location = os.path.join(settings.MEDIA_ROOT, 'blog_img/')
     base_url = urljoin(settings.MEDIA_URL, 'blog_img/')
+
+
+def image_compress(image_path, height, width):
+    """
+    Оптимизация изображений
+    Ресайзинг и оптимизация изображения в Django
+    не использую так как стоит другой
+    """
+    img = Image.open(image_path)
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+    if img.height > height or img.width > width:
+        output_size = (height, width)
+        img.thumbnail(output_size)
+    img = ImageOps.exif_transpose(img)
+    img.save(image_path, format='JPEG', quality=90, optimize=True)

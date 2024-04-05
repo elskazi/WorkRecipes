@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django_ckeditor_5',
     'captcha',
     'taggit',
+    #'django_cleanup', #pip install django-cleanup - автоматически удалять неиспользуемые медиа-файлы
 
     'services',  # folder for utils
 
