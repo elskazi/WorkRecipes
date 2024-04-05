@@ -74,7 +74,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware'
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'system.middleware.ActiveUserMiddleware', # Функционал статуса пользователя (онлайн/оффлайн) в Django с кэшированием
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -115,6 +116,14 @@ DATABASES = {
         'PASSWORD': '123',
         'HOST': 'localhost',
         'PORT': 5432,
+    }
+}
+
+# Функционал статуса пользователя (онлайн/оффлайн) в Django с кэшированием
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': (BASE_DIR / 'cache'),
     }
 }
 

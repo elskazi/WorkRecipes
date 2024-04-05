@@ -6,6 +6,8 @@ from datetime import date, timedelta
 from django.db.models.signals import post_save      # сигналы
 from django.dispatch import receiver                # сигналы
 from django_resized import ResizedImageField        # resizer image
+from django.utils import timezone   #Функционал статуса пользователя (онлайн/оффлайн)
+from django.core.cache import cache #Функционал статуса пользователя (онлайн/оффлайн)
 
 
 from services.utils import unique_slugify
@@ -33,6 +35,13 @@ class Profile(models.Model):
                                validators=[FileExtensionValidator(allowed_extensions=('png', 'jpg', 'jpeg'))])
     bio = models.TextField(max_length=500, blank=True, verbose_name='Информация о себе')
     birth_date = models.DateField(null=True, blank=True, verbose_name='Дата рождения')
+
+    def is_online(self):
+        '''Функционал статуса пользователя (онлайн/оффлайн) в Django с кэшированием'''
+        last_seen = cache.get(f'last-seen-{self.user.id}')
+        if last_seen is not None and timezone.now() < last_seen + timezone.timedelta(seconds=300):
+            return True
+        return False
 
     @property
     def get_avatar(self):
