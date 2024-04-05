@@ -72,7 +72,7 @@ class News(models.Model):
             """
             return self.get_queryset().filter(is_published=True,
                                               category__is_published=True).\
-                select_related('category', 'created_by', 'created_by__profile')
+                select_related('category', 'created_by', 'created_by__profile').prefetch_related('ratings')
 
         def detail(self):
             """
@@ -80,7 +80,7 @@ class News(models.Model):
             """
             return self.get_queryset() \
                 .select_related('created_by', 'category', 'created_by__profile') \
-                .prefetch_related('comments', 'comments__created_by', 'comments__created_by__profile','tags') \
+                .prefetch_related('comments', 'comments__created_by', 'comments__created_by__profile','tags', 'ratings') \
                 .filter(is_published=True, category__is_published=True )
 
     """ Тут можно жестко лажануть, и забыть что обьект переопределен НО только АЛЛ()"""
@@ -132,6 +132,10 @@ class News(models.Model):
             self.slug = unique_slugify(self, self.title)
         super().save(*args, **kwargs)
 
+    def get_sum_rating(self):
+        ''' подсчета суммы рейтинг '''
+        return sum([rating.value for rating in self.ratings.all()])
+
 
 class Comment(MPTTModel):
     """
@@ -158,3 +162,25 @@ class Comment(MPTTModel):
 
     def __str__(self):
         return f'{self.created_by}:{self.content}'
+
+
+class Rating(models.Model):
+    """
+    Модель рейтинга: Лайк - Дизлайк
+    """
+    news = models.ForeignKey(to=News, verbose_name='Статья', on_delete=models.CASCADE, related_name='ratings')
+    created_by = models.ForeignKey(to=User, verbose_name='Пользователь', on_delete=models.CASCADE, blank=True, null=True)
+    value = models.IntegerField(verbose_name='Значение', choices=[(1, 'Нравится'), (-1, 'Не нравится')])
+    created_at = models.DateTimeField(verbose_name='Время добавления', auto_now_add=True)
+    ip_address = models.GenericIPAddressField(verbose_name='IP Адрес')
+
+    class Meta:
+        '''  unique_together гарантирует уникальность комбинации article и ip_address. '''
+        unique_together = ('news', 'ip_address')
+        ordering = ('-created_at',)
+        indexes = [models.Index(fields=['-created_at', 'value'])]
+        verbose_name = 'Рейтинг'
+        verbose_name_plural = 'Рейтинги'
+
+    def __str__(self):
+        return self.news.title

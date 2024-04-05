@@ -1,4 +1,5 @@
 from django.conf import settings
+
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -8,13 +9,14 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin  # разрешение, надо сделать авторизацию авторизацию
 from django.contrib.messages.views import SuccessMessageMixin  # Миксин уведомления, отправляет сообщение в шаблон
 from services.mixins import AuthorRequiredMixin  # Миксин редактирования статьи только автор
-from .models import News, Category, Comment
+from services.utils import get_client_ip  # для рейтинга , что б с 1 ип й раз
+from .models import News, Category, Comment, Rating
 from .forms import NewsCreateForm, NewsUpdateForm, CommentCreateForm
 from taggit.models import Tag
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank # поиск Postgers
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank  # поиск Postgers
 
-import random                   # для похожих статей (по тегу)
-from django.db.models import Count # для похожих статей (по тегу)
+import random  # для похожих статей (по тегу)
+from django.db.models import Count  # для похожих статей (по тегу)
 
 
 class NewsListViews(ListView):
@@ -65,8 +67,8 @@ class NewsByCategoryListView(ListView):
 
 class NewsByTagListView(ListView):
     model = News
-    #template_name = 'blog/news_list.html'
-    #context_object_name = 'articles'
+    # template_name = 'blog/news_list.html'
+    # context_object_name = 'articles'
     paginate_by = 9
     tag = None
 
@@ -114,7 +116,7 @@ class NewsCreateViews(LoginRequiredMixin, CreateView):
     # fields = 'title', 'content', 'photo', ...              # используем NewsCreateForm
     # success_url = reverse_lazy('blog:news_list')           # без этого перенаправит на созданную статью
     # login_url = reverse_lazy("blog:news_request")          # куда перекинуть после авторизации, пропискано в настройках
-    #template_name = 'blog/news_form.html'                  # форма по умолчанию
+    # template_name = 'blog/news_form.html'                  # форма по умолчанию
     page_header = 'Добавление новой записи'
     page_title = 'Добавление новой записи'
 
@@ -208,40 +210,43 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
             }, status=200)
 
         return redirect(comment.news.get_absolute_url())
-        #return redirect("blog:comment_create_view")
+        # return redirect("blog:comment_create_view")
 
     def handle_no_permission(self):
         return JsonResponse({'error': 'Необходимо авторизоваться для добавления комментариев'}, status=400)
+
 
 class NewsSearchResultView(ListView):
     """
     Реализация поиска статей на сайте
     """
     model = News
-    #context_object_name = 'articles'
+    # context_object_name = 'articles'
     paginate_by = 10
     allow_empty = True
-    #template_name = 'blog/news_list.html'
+
+    # template_name = 'blog/news_list.html'
 
     def get_queryset(self):
         query = self.request.GET.get('do')
-        search_vector = SearchVector('content','title')
+        search_vector = SearchVector('content', 'title')
         search_query = SearchQuery(query)
         return (self.model.objects.annotate(search=search_vector,
                                             rank=SearchRank(search_vector, search_query)).
                 filter(search=search_query).
                 order_by('-rank'))
-        #Post.object.annotate(search=SearchVector('title', 'body')).filter(search=query)
+        # Post.object.annotate(search=SearchVector('title', 'body')).filter(search=query)
+
     ''' search_vector = SearchVector('title', 'body')
         search_query = SearchQuery(query)
         results = Post.object.annotate(search=search_vector,
             rank=SearchRank(search_vector, search_query)).filter(search=search_query).order_by('-rank')
     '''
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = f'Результаты поиска: {self.request.GET.get("do")}'
         return context
-
 
 
 class HttpRequestPage(View):
@@ -257,3 +262,30 @@ class HttpRequestPage(View):
 
         }
         return render(request, "blog/http_request_page.html", context=context)
+
+
+class RatingCreateView(View):
+    model = Rating
+
+    def post(self, request, *args, **kwargs):
+        article_id = request.POST.get('article_id')
+        value = int(request.POST.get('value'))
+        ip_address = get_client_ip(request)
+        user = request.user if request.user.is_authenticated else None
+
+        rating, created = self.model.objects.get_or_create(
+            article_id=article_id,
+            ip_address=ip_address,
+            defaults={'value': value, 'user': user},
+        )
+
+        if not created:
+            if rating.value == value:
+                rating.delete()
+                return JsonResponse({'status': 'deleted', 'rating_sum': rating.news.get_sum_rating()})
+            else:
+                rating.value = value
+                rating.user = user
+                rating.save()
+                return JsonResponse({'status': 'updated', 'rating_sum': rating.news.get_sum_rating()})
+        return JsonResponse({'status': 'created', 'rating_sum': rating.news.get_sum_rating()})

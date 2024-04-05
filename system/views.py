@@ -106,7 +106,7 @@ class UserRegisterView(UserIsNotAuthenticated, SuccessMessageMixin, CreateView):
     Представление регистрации на сайте с формой регистрации, и отправкой письма подтвеждения
     """
     form_class = UserRegisterForm
-    # success_url = reverse_lazy('blog:news_list')
+    success_url = reverse_lazy('blog:news_list') # ну
     template_name = 'system/registration/user_register.html'
     success_message = 'Письмо подтверждения отправлено!'
 

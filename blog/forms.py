@@ -11,7 +11,7 @@ class NewsCreateForm(forms.ModelForm):
 
     class Meta:
         model = News
-        fields = ('title', 'slug', 'category', 'short_content', 'content', 'photo', 'is_published')
+        fields = ('title', 'slug', 'category', 'short_content', 'content', 'photo', 'is_published', 'tags')
 
     def __init__(self, *args, **kwargs):
         """

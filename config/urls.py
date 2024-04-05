@@ -1,13 +1,21 @@
 from django.contrib import admin
 from django.urls import path, include
 
-"""Подключение статики и медиа."""
-from config import settings
+from config import settings  # Подключение статики и медиа.
 from django.conf.urls.static import static
+
+from django.contrib.sitemaps.views import sitemap  # sitemap
+from blog.sitemaps import StaticSitemap, ArticleSitemap  # sitemap
+
+sitemaps = {
+    'static': StaticSitemap,
+    'articles': ArticleSitemap,
+}
 
 urlpatterns = [
     path('ckeditor5/', include('django_ckeditor_5.urls')),  # text editor
     path('admin/', admin.site.urls),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('', include('blog.urls')),
     path('', include('system.urls')),
 ]

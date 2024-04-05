@@ -36,7 +36,8 @@
                                                 uk-card-hover uk-margin-remove-first-child uk-link-toggle uk-display-block">
                                                     <div class="uk-card-media-top">
                                                         <img decoding="async"
-                                                             src="{% if item.photo %}{{ item.photo.url }}{% else %}{% static 'images/BestCow800x450.jpg' %}{% endif %}"
+                                                             src="
+                                                                     {% if item.photo %}{{ item.photo.url }}{% else %}{% static 'images/BestCow800x450.jpg' %}{% endif %}"
                                                              class="el-image"
                                                              alt="{{ item.title }}"
                                                              loading="lazy">
@@ -64,6 +65,17 @@
                                                                 {{ item.short_content|safe|truncatechars:77 }}
                                                             {% endautoescape %}
                                                         </div>
+                                                        {# likes  #}
+                                                        <div class="rating-buttons">
+                                                            <button class="btn btn-sm btn-primary"
+                                                                    data-article="{{ item.id }}" data-value="1">Лайк
+                                                            </button>
+                                                            <button class="btn btn-sm btn-secondary"
+                                                                    data-article="{{ item.id }}" data-value="-1">
+                                                                Дизлайк
+                                                            </button>
+                                                            <button class="btn btn-sm btn-secondary rating-sum">{{ item.get_sum_rating }}</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -83,3 +95,7 @@
         </div>
     </main>
 {% endblock %}
+
+{% block script %}
+<script src="{% static 'custom/js/ratings.js' %}"></script>
+{% endblock%}

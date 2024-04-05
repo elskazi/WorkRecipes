@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',  # нужен для прописывание в админке домена, дописать! SITE_ID = 1, Миграцию сделать!
-
+    'django.contrib.sitemaps', # карта сайта, далее создаем файл в "блог" sipemap.py
     'debug_toolbar',
     'mptt',  # MPTT вложенные категории
     'django_ckeditor_5',
@@ -109,7 +109,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'WR1',
+        'NAME': 'WR2',
         'USER': 'postgres',
         'PASSWORD': '123',
         'HOST': 'localhost',
