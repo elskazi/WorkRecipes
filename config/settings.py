@@ -1,6 +1,9 @@
 """
-python -m pip install Pillow
 git init
+pip freeze > .\requirements.txt
+celery -A config worker -l info  # запуск celery
+
+python -m pip install Pillow
 pip install django-resized  Изменяет размер и качество избражения https://github.com/un1t/django-resized
 pip install django-ckeditor-5
 pip install django-mptt     МРТТ категории вложенные (можно одну категория вклыдвать в другую категорию)
@@ -10,6 +13,8 @@ pip install django-recaptcha==3.0.0  Капча
 pip install django-taggit   Тэги    py manage.py migrate
 pip install django-autocomplete-light  Удалил, хотел сделать автоподстановку тегов
 pip install psycopg2 Postgres
+pip install redis
+pip install celery
 
 """
 
@@ -121,12 +126,38 @@ DATABASES = {
 }
 
 # Функционал статуса пользователя (онлайн/оффлайн) в Django с кэшированием
+# Кэш локаольный (в файл)
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+#         'LOCATION': (BASE_DIR / 'cache'),
+#     }
+# }
+
+# Кэш RedisCache ( redis-server windows)
+'''
+    Redis in Docker, donwload and start
+    docker pull redis:latest
+    docker run --name redis-server -p 6379:6379 -d redis:latest
+    Если Django будет в докере то надо стучаться по адресу  redis://redis:6379 а не ЛокалХост
+'''
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': (BASE_DIR / 'cache'),
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://localhost:6379',
     }
 }
+
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Moscow'
+
 
 # Авторизация по email и по логину (свой бекенд аутентификации
 AUTHENTICATION_BACKENDS = [
