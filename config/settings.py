@@ -2,6 +2,7 @@
 git init
 pip freeze > .\requirements.txt
 celery -A config worker -l info  # запуск celery
+celery --app=config worker --loglevel=info --pool=solo  # больше инфо
 
 python -m pip install Pillow
 pip install django-resized  Изменяет размер и качество избражения https://github.com/un1t/django-resized

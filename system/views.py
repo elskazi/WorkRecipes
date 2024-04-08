@@ -10,7 +10,6 @@ from django.core.mail import send_mail  # подтвеждение емайла
 from django.contrib.auth import login  # подтвеждение емайла
 from django.shortcuts import redirect, render
 
-
 from django.contrib.messages.views import SuccessMessageMixin  # Messages
 from django.contrib.auth.mixins import UserPassesTestMixin  # тест на изменение профиля
 from django.contrib.auth.views import (PasswordChangeView, PasswordResetConfirmView,
@@ -23,6 +22,8 @@ from .forms import (UserUpdateForm, ProfileUpdateForm, UserRegisterForm, UserLog
 from services.mixins import UserIsNotAuthenticated  # запрет регистрации авторизованных юзеров
 from services.email import send_contact_email_message # отрпавка письма Админу
 from services.utils import get_client_ip  # получение IP
+
+from services.tasks import send_activate_email_message_task, send_contact_email_message_task # Задача отправки емайла через Селерити
 
 from django.contrib.auth import get_user_model  # model User, нужен для подтвеждение емайла
 
@@ -120,18 +121,20 @@ class UserRegisterView(UserIsNotAuthenticated, SuccessMessageMixin, CreateView):
         user = form.save(commit=False)
         user.is_active = False
         user.save()
+        # Метод delay() используется в связке с Celery для асинхронного выполнения задач.
+        send_activate_email_message_task.delay(user.id)
         # Функционал для отправки письма и генерации токена
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        activation_url = reverse_lazy('system:confirm_email', kwargs={'uidb64': uid, 'token': token})
-        current_site = Site.objects.get_current().domain
-        send_mail(
-            'Подтвердите свой электронный адрес',
-            f'Пожалуйста, перейдите по следующей ссылке, чтобы подтвердить свой адрес электронной почты: http://{current_site}{activation_url}',
-            'elskazii@yandex.ru',
-            [user.email],
-            fail_silently=False,
-        )
+        # token = default_token_generator.make_token(user)
+        # uid = urlsafe_base64_encode(force_bytes(user.pk))
+        # activation_url = reverse_lazy('system:confirm_email', kwargs={'uidb64': uid, 'token': token})
+        # current_site = Site.objects.get_current().domain
+        # send_mail(
+        #     'Подтвердите свой электронный адрес',
+        #     f'Пожалуйста, перейдите по следующей ссылке, чтобы подтвердить свой адрес электронной почты: http://{current_site}{activation_url}',
+        #     'elskazii@yandex.ru',
+        #     [user.email],
+        #     fail_silently=False,
+        # )
         return redirect('system:email_confirmation_sent')
 
 
@@ -282,11 +285,14 @@ class FeedbackCreateView(SuccessMessageMixin, CreateView):
             feedback.ip_address = get_client_ip(self.request)
             if self.request.user.is_authenticated:
                 feedback.user = self.request.user
-            send_contact_email_message(feedback.subject, feedback.email, feedback.content, feedback.ip_address,
-                                       feedback.user_id)
+            #send_contact_email_message(feedback.subject, feedback.email, feedback.content, feedback.ip_address,
+            #                           feedback.user_id)
+            # Метод delay() используется в связке с Celery для асинхронного выполнения задач.
+            send_contact_email_message_task.delay(feedback.subject, feedback.email, feedback.content,
+                                                  feedback.ip_address, feedback.user_id)
         return super().form_valid(form)
 
-
+# Ошибки  404 500 403
 def tr_handler404(request, exception):
     """
     Обработка ошибки 404
