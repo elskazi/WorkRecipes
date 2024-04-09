@@ -11,15 +11,21 @@ pip install django-mptt     МРТТ категории вложенные (мо
 pip install pytils          сохранения уникального slug https://proghunter.ru/articles/django-base-2023-automatic-slug-generation-cyrillic-handling-in-django-9
 pip install django-debug-toolbar    INSATALL- 'debug_toolbar'  middleware - 'debug_toolbar.middleware.DebugToolbarMiddleware'
 pip install django-recaptcha==3.0.0  Капча
-pip install django-taggit   Тэги    py manage.py migrate
-pip install django-autocomplete-light  Удалил, хотел сделать автоподстановку тегов
+pip install django-taggit   #Тэги    py manage.py migrate
+pip install django-autocomplete-light  #Удалил, хотел сделать автоподстановку тегов
 pip install psycopg2 Postgres
-pip install redis
-pip install celery
+pip install redis  # redis-server
 
+pip install celery  Планировзик задач
+pip install django-celery-beat #компонент Celery, который отвечает за периодическое выполнение задач в фоновом режиме.
+
+Для запуска worker'а используется команда: celery --app=config worker --loglevel=info --pool=solo
+Для запуска beat'а: celery -A config beat -l info
 """
 
 from pathlib import Path
+from celery.schedules import crontab # для задача резервного копирования выполнялась по расписанию
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from django.urls import reverse_lazy
@@ -158,6 +164,14 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Moscow'
+
+# django-celery-beat компонент Celery, который отвечает за периодическое выполнение задач в фоновом режиме
+CELERY_BEAT_SCHEDULE = {
+    'backup_database': {
+        'task': 'services.tasks.dbackup_task', # Путь к задаче указанной в tasks.py
+        'schedule': crontab(hour=14, minute=10),  # Резервная копия будет создаваться каждый день в полночь
+    },
+}
 
 
 # Авторизация по email и по логину (свой бекенд аутентификации
