@@ -74,7 +74,7 @@ class News(models.Model):
             """
             return self.get_queryset().filter(is_published=True,
                                               category__is_published=True).\
-                select_related('category', 'created_by', 'created_by__profile').prefetch_related('ratings')
+                select_related('category', 'created_by', 'created_by__profile').prefetch_related('ratings', 'views')
 
         def detail(self):
             """
@@ -82,7 +82,7 @@ class News(models.Model):
             """
             return self.get_queryset() \
                 .select_related('created_by', 'category', 'created_by__profile') \
-                .prefetch_related('comments', 'comments__created_by', 'comments__created_by__profile','tags', 'ratings') \
+                .prefetch_related('comments', 'comments__created_by', 'comments__created_by__profile','tags', 'ratings', 'views') \
                 .filter(is_published=True, category__is_published=True )
 
     """ Тут можно жестко лажануть, и забыть что обьект переопределен НО только АЛЛ()"""
@@ -105,7 +105,7 @@ class News(models.Model):
     updater = models.ForeignKey(to=User, verbose_name='Обновил', on_delete=models.SET_NULL, null=True,
                                 related_name='updater_posts', blank=True)
     fixed = models.BooleanField(verbose_name='Зафиксировано', default=False)
-    views = models.IntegerField(default=0, verbose_name='Просмотры', )
+    #views = models.IntegerField(default=0, verbose_name='Просмотры', )
     tags = TaggableManager()
 
     class Meta:
@@ -146,6 +146,13 @@ class News(models.Model):
     def get_sum_rating(self):
         ''' подсчета суммы рейтинг '''
         return sum([rating.value for rating in self.ratings.all()])
+
+    def get_view_count(self):
+        """
+        Возвращает количество просмотров для данной статьи
+        обращаемся к классу ViewCount в нем related_name = views
+        """
+        return self.views.count()
 
 
 
@@ -196,6 +203,24 @@ class Rating(models.Model):
         indexes = [models.Index(fields=['-created_at', 'value'])]
         verbose_name = 'Рейтинг'
         verbose_name_plural = 'Рейтинги'
+
+    def __str__(self):
+        return self.news.title
+
+
+class ViewCount(models.Model):
+    """
+    Модель просмотров для статей
+    """
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name='views')
+    ip_address = models.GenericIPAddressField(verbose_name='IP адрес')
+    viewed_on = models.DateTimeField(auto_now_add=True, verbose_name='Дата просмотра')
+
+    class Meta:
+        ordering = ('-viewed_on',)
+        indexes = [models.Index(fields=['-viewed_on'])]
+        verbose_name = 'Просмотр'
+        verbose_name_plural = 'Просмотры'
 
     def __str__(self):
         return self.news.title

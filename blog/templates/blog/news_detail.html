@@ -20,25 +20,31 @@
 
                             <time datetime="{{ object.created_at }}">{{ object.created_at }}</time>
 
-                            | <a href="{{ object.created_by.profile.get_absolute_url }}">
-                            {# {% url 'system:profile_detail' slug=object.created_by.profile.slug  %}  #}
-                            {{ object.created_by }}
-                        </a> | <a
-                                href="{% url 'blog:news_by_category' object.category.slug %}"
-                                rel="tag">{{ object.category.title }}</a>
+                            |
+                            <a href="{{ object.created_by.profile.get_absolute_url }}">
+                                {# {% url 'system:profile_detail' slug=object.created_by.profile.slug  %}  #}
+                                {{ object.created_by }}
+                            </a>
+                            |
+                            <a
+                                    href="{% url 'blog:news_by_category' object.category.slug %}"
+                                    rel="tag">{{ object.category.title }}</a>
+
 
                             {% if object.tags.all %}
-
-                                | Теги записи: {% for tag in object.tags.all %}
+                                | Теги записи:
+                                {% for tag in object.tags.all %}
                                 <a href="{% url 'blog:news_by_tags' tag.slug %}">{{ tag }}</a>,
-                            {% endfor %}
-
+                                {% endfor %}
                             {% endif %}
+                            <br>
+                            Просмотры: {{ object.get_view_count }}
 
                         </h4>
                         <div class="uk-margin">
                             <img decoding="async"
                                  src="
+
                                          {% if object.photo %}{{ object.photo.url }}{% else %}{% static 'images/BestCow800x450.jpg' %}{% endif %}"
                                  width="780"
                                  class="el-image" alt="{{ object.title }}" loading="lazy">

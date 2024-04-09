@@ -18,6 +18,8 @@ from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 import random  # для похожих статей (по тегу)
 from django.db.models import Count  # для похожих статей (по тегу)
 
+from .mixins import ViewCountMixin # миксин просмотров
+
 
 class NewsListViews(ListView):
     """ Список всех статей """
@@ -83,7 +85,7 @@ class NewsByTagListView(ListView):
         return context
 
 
-class NewsDetailViews(DetailView):
+class NewsDetailViews(ViewCountMixin, DetailView):
     """Детали статьи"""
     model = News
     queryset = model.objects.detail()

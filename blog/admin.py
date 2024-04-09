@@ -1,6 +1,6 @@
 from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin # Вложенные категори МРТТ
-from .models import News, Category, Comment
+from .models import News, Category, Comment, ViewCount
 
 # изменение формата дат в админке в приложении данном
 from django.conf.locale.ru import formats as ru_formats
@@ -56,7 +56,9 @@ class CommentAdminPage(DraggableMPTTAdmin):
 # admin.site.register(News, NewsAdmin)  # other view
 # admin.site.register(Category, CategoryAdmin)
 
-
+@admin.register(ViewCount)
+class ViewCountAdmin(admin.ModelAdmin):
+    list_display = ('news', 'ip_address', 'viewed_on')
 
 
 
