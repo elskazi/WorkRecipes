@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model      # model USER
 from services.utils import unique_slugify           # use my utils for slug unical
 from django.core.validators import FileExtensionValidator # для проверки расширения изображения
 from taggit.managers import TaggableManager # Tags
+from datetime import date
 #from services.utils import unique_slugify, image_compress
 
 
@@ -153,6 +154,13 @@ class News(models.Model):
         обращаемся к классу ViewCount в нем related_name = views
         """
         return self.views.count()
+
+    def get_today_view_count(self):
+        """
+        Возвращает количество просмотров для данной статьи за сегодняшний день
+        """
+        today = date.today()
+        return self.views.filter(viewed_on__date=today).count()
 
 
 

@@ -1,8 +1,9 @@
 {#{% load mptt_tags %}#}
 
-
 {# Ниже имеется ввиду Загрузить - имя файла в blog/templatetags/ через пробел#}
 {% load category_menu_sidebar blog_tags  %}
+{# кэш для Популярные статьи за 7 дней #}
+{% load blog_tags cache %}
 
 <div class="uk-width-1-3@m uk-flex-first@s">
     {# IncludeTag имя функции в blog/templatetags/category_menu_sidebar.py #}
@@ -27,6 +28,24 @@
     {# IncludeTag имя функции в blog/templatetags/blog_tags.py #}
     {# количество выводимых комментариев = 5. #}
     {% show_latest_comments count=5 %}
+{% cache 300 sidebar %}
+<div class="card mb-2">
+	<div class="card-body">
+		<h5 class="card-title">Популярные статьи за 7 дней</h5>
+		<div class="card-text">
+			<ul>
+				{% popular_articles as articles_list %}
+        		{% for article in articles_list %}
+{#  Список популярных статей на сайте, где () это всего просмотров, где +() - просмотров за день #}
+				<li><a href="{{ article.get_absolute_url }}">{{ article.title }}</a> ({{ article.get_view_count }}) +({{ article.get_today_view_count}})</li>
+				{% empty %}
+				<li>Популярных статей не найдено.</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
+{% endcache %}
 
 </div>
 {# было ранее Категории без использования шаблонныхТэгов#}
