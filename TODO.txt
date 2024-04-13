@@ -9,6 +9,11 @@ python -Xutf8 manage.py dumpdata --exclude contenttypes --exclude auth.permissio
 Восстановить БД из json:
 python manage.py loaddata db.json
 python -Xutf8 manage.py loaddata db.json
+--------------------------------------------------
+Docker
+docker compose -f docker-compose.dev.yml build
+docker compose -f docker-compose.dev.yml up
+docker compose build --up
 ------------------------------------------------
 Что сделать:
 много запросов из - class NewsByCategoryListView(ListView), надо сделать менеджер в моделе

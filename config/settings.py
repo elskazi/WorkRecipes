@@ -21,34 +21,39 @@ pip install django-celery-beat #компонент Celery, который отв
 
 Для запуска worker'а используется команда: celery --app=config worker --loglevel=info --pool=solo
 Для запуска beat'а: celery -A config beat -l info
+
+pip install django-environ  #  корректно работали переменные виртуального окружения
 """
-
-from pathlib import Path
-from celery.schedules import crontab # для задача резервного копирования выполнялась по расписанию
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-from django.urls import reverse_lazy
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
+from pathlib import Path
+from django.urls import reverse_lazy
+from celery.schedules import crontab  # для задача резервного копирования выполнялась по расписанию
+import environ  # для переменных окружения
+
+# Работа с env.dev
+env = environ.Env()
+environ.Env.read_env(env_file=Path('../docker/env/.env.dev'))
+# параметр для правильной работы, при использовании вирт окр.
+CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS').split()
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-u755mln2j*cu^md5s2-_je4vnx6&o%$$=soz0!m3+-o(vkbqx+'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Что проверить 404 ошибки стр надо поставить False
-DEBUG = True
+# Что б проверить 404 ошибки стр надо поставить False
+DEBUG = int(env('DEBUG', default=1))
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost',]
-INTERNAL_IPS = [  # for use debug toold bar
-    '127.0.0.1',
-    'localhost'
-]
+ALLOWED_HOSTS = env('ALLOWED_HOSTS').split()
+
+# Для использования debug tool bar
+INTERNAL_IPS = ['127.0.0.1', 'localhost']
+
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -57,25 +62,29 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',  # нужен для прописывание в админке домена, дописать! SITE_ID = 1, Миграцию сделать!
-    'django.contrib.sitemaps', # карта сайта, далее создаем файл в "блог" sipemap.py
+    'django.contrib.sitemaps',  # карта сайта, далее создаем файл в "блог" sipemap.py
     'debug_toolbar',
     'mptt',  # MPTT вложенные категории
     'django_ckeditor_5',
     'captcha',
     'taggit',
-    #'django_cleanup', #pip install django-cleanup - автоматически удалять неиспользуемые медиа-файлы
+    # 'django_cleanup', #pip install django-cleanup - автоматически удалять неиспользуемые медиа-файлы
 
     'services',  # folder for utils
 
     'blog.apps.BlogConfig',  # blog
     'system.apps.SystemConfig',  # users
 ]
-SITE_ID = 1  # нужен для прописывание в админке домена, дописать 'django.contrib.sites' и миграцию
 
-RECAPTCHA_PUBLIC_KEY = '6LduxqUpAAAAAINXzAkfW_FO7L8vbYkDcin2Rdik'
-RECAPTCHA_PRIVATE_KEY = '6LduxqUpAAAAALVRPLoJU6xPKs9w0pwccKbh_QKB'
+# нужен для прописывание в админке домена, дописать 'django.contrib.sites' и миграцию
+SITE_ID = 1
+
+# Капча
+RECAPTCHA_PUBLIC_KEY = env('RECAPTCHA_PUBLIC_KEY') # '6LduxqUpAAAAAINXzAkfW_FO7L8vbYkDcin2Rdik'
+RECAPTCHA_PRIVATE_KEY = env('RECAPTCHA_PRIVATE_KEY') # '6LduxqUpAAAAALVRPLoJU6xPKs9w0pwccKbh_QKB'
 # RECAPTCHA_DOMAIN = 'www.recaptcha.net'
 
+# Тэги
 TAGGIT_CASE_INSENSITIVE = True
 TAGGIT_STRIP_UNICODE_WHEN_SLUGIFYING = True
 
@@ -88,7 +97,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'system.middleware.ActiveUserMiddleware', # Функционал статуса пользователя (онлайн/оффлайн) в Django с кэшированием
+    'system.middleware.ActiveUserMiddleware',
+    # Функционал статуса пользователя (онлайн/оффлайн) в Django с кэшированием
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -124,11 +134,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'WR2',
-        'USER': 'postgres',
-        'PASSWORD': '123',
-        'HOST': 'localhost',
-        'PORT': 5432,
+        'NAME': env('POSTGRES_DB'), #'WR2',
+        'USER': env('POSTGRES_USER'), #'postgres',
+        'PASSWORD': env('POSTGRES_PASSWORD'), #'123',
+        'HOST': env('POSTGRES_HOST'), #'localhost',
+        'PORT': env('POSTGRES_PORT'), # 5432,
     }
 }
 
@@ -151,13 +161,14 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://localhost:6379',
+        'LOCATION': env('REDIS_LOCATION'),
+        # 'LOCATION': 'redis://localhost:6379',
     }
 }
 
 # Celery settings
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = env('CELERY_BROKER_URL') #'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND') #'redis://localhost:6379/0'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_ACCEPT_CONTENT = ['application/json']
@@ -168,11 +179,10 @@ CELERY_TIMEZONE = 'Europe/Moscow'
 # django-celery-beat компонент Celery, который отвечает за периодическое выполнение задач в фоновом режиме
 CELERY_BEAT_SCHEDULE = {
     'backup_database': {
-        'task': 'services.tasks.dbackup_task', # Путь к задаче указанной в tasks.py
+        'task': 'services.tasks.dbackup_task',  # Путь к задаче указанной в tasks.py
         'schedule': crontab(hour=14, minute=10),  # Резервная копия будет создаваться каждый день в полночь
     },
 }
-
 
 # Авторизация по email и по логину (свой бекенд аутентификации
 AUTHENTICATION_BACKENDS = [
@@ -237,18 +247,18 @@ DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
 # С сервера imap.yandex.ru по протоколу IMAP
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # для реальной отправки
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # для консоли
-EMAIL_HOST = 'smtp.yandex.ru'  # 'mail.btrussia.ru' #'mail.btrussia.com'    'smtp.yandex.ru'
-EMAIL_PORT = 465  # 25
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True  # True
-EMAIL_HOST_USER = 'elskazi@yandex.ru'
-EMAIL_HOST_PASSWORD = 'tasgctausctqfrnf'
+EMAIL_HOST = env('EMAIL_HOST') #'smtp.yandex.ru'  # 'mail.btrussia.ru' #'mail.btrussia.com'    'smtp.yandex.ru'
+EMAIL_PORT = env('EMAIL_PORT') #465  # 25 foo
+EMAIL_USE_TLS = int(env('EMAIL_USE_TLS', default=1))  # было False a SSL - True
+#EMAIL_USE_SSL = True  # True
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_SERVER = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = ['elskazii@yandex.ru']
 
 # Настройки тектового редактора
-CKEDITOR_5_FILE_STORAGE =  'services.utils.CkeditorCustomStorage' # функция куда сохранять изобраджения именно через редактор
+CKEDITOR_5_FILE_STORAGE = 'services.utils.CkeditorCustomStorage'  # функция куда сохранять изобраджения именно через редактор
 # CKEDITOR_5_CUSTOM_CSS = 'path_to.css'                       # optional
 # CKEDITOR_5_FILE_STORAGE = "path_to_storage.CustomStorage"   # optional
 
@@ -279,7 +289,6 @@ customColorPalette = [
     },
 ]
 
-
 CKEDITOR_5_CONFIGS = {
     'default': {
         'toolbar': ['heading', '|', 'bold', 'italic', 'link',
@@ -295,13 +304,13 @@ CKEDITOR_5_CONFIGS = {
             'blockQuote',
         ],
         'toolbar': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
-        'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
-                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
+                    'code', 'subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
+                    'bulletedList', 'numberedList', 'todoList', '|', 'blockQuote', 'imageUpload', '|',
                     'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
-                    'insertTable',],
+                    'insertTable', ],
         'image': {
             'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
-                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
+                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side', '|'],
             'styles': [
                 'full',
                 'side',
@@ -312,8 +321,8 @@ CKEDITOR_5_CONFIGS = {
 
         },
         'table': {
-            'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
-            'tableProperties', 'tableCellProperties' ],
+            'contentToolbar': ['tableColumn', 'tableRow', 'mergeTableCells',
+                               'tableProperties', 'tableCellProperties'],
             'tableProperties': {
                 'borderColors': customColorPalette,
                 'backgroundColors': customColorPalette
@@ -323,12 +332,12 @@ CKEDITOR_5_CONFIGS = {
                 'backgroundColors': customColorPalette
             }
         },
-        'heading' : {
+        'heading': {
             'options': [
-                { 'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph' },
-                { 'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1' },
-                { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
-                { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
+                {'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph'},
+                {'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1'},
+                {'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2'},
+                {'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3'}
             ]
         }
     },

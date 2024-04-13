@@ -124,7 +124,7 @@ fabric.properties
 
 # Distribution / packaging
 .Python
-env/
+docker/env/
 build/
 develop-eggs/
 dist/
@@ -198,7 +198,7 @@ celerybeat-schedule
 # virtualenv
 .venv
 venv/
-ENV/
+docker/env/
 
 # Spyder project settings
 .spyderproject
