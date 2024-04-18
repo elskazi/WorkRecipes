@@ -71,7 +71,7 @@ services:
     volumes:
       - ./:/app
       - media:/app/media
-    command: celery -A backend worker --loglevel=info --logfile=./docker/logs/celery-worker.log
+    command: celery -A config worker --loglevel=info --logfile=./docker/logs/celery-worker.log
     depends_on:
       - redis
 
@@ -82,7 +82,7 @@ services:
           - docker/env/.env.dev
       depends_on:
           - redis
-      command: celery -A backend beat --loglevel=info --logfile=./docker/logs/celery-beat.log
+      command: celery -A config beat --loglevel=info --logfile=./docker/logs/celery-beat.log
       volumes:
           - media:/app/media
           - ./:/app

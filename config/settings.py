@@ -34,9 +34,9 @@ import environ  # для переменных окружения
 
 # Работа с env.dev
 env = environ.Env()
-environ.Env.read_env(env_file=Path('../docker/env/.env.dev'))
+environ.Env.read_env(env_file=Path('./docker/env/.env.dev'))
 # параметр для правильной работы, при использовании вирт окр.
-CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS').split()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -50,6 +50,7 @@ DEBUG = int(env('DEBUG', default=1))
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS').split()
 
+CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS').split()
 # Для использования debug tool bar
 INTERNAL_IPS = ['127.0.0.1', 'localhost']
 
