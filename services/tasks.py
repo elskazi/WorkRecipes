@@ -24,10 +24,10 @@ def send_contact_email_message_task(subject, email, content, ip, user_id):
     """
     return send_contact_email_message(subject, email, content, ip, user_id)
 
-"""
-Выполнение резервного копирования базы данных
-.\services\management\commands\dbackup.py
-"""
-# @shared_task()
-# def dbackup_task():
-#     call_command('dbackup')  # имя вызываемого файла  \services\management\commands\dbackup.py
+
+# Выполнение резервного копирования базы данных
+# .\services\management\commands\dbackup.py
+
+@shared_task()
+def dbackup_task():
+    call_command('dbackup')  # имя вызываемого файла  \services\management\commands\dbackup.py

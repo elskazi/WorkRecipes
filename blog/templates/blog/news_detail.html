@@ -2,9 +2,9 @@
 {% load static %}
 {% load mptt_tags %}
 
-{% block title %}
-    {{ object.title }} | {{ block.super }}
-{% endblock %}
+    {% block title %}
+        {{ object.title }} | {{ block.super }}
+    {% endblock %}
 
 {% block body %}
     <main id="tm-main">
